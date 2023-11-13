@@ -12,3 +12,4 @@ The server will be capable of managing channels, users, private messages, and IR
 * http://chi.cs.uchicago.edu/chirc/irc.html#the-irc-protocol
 * https://modern.ircdocs.horse/#mode-message
 * https://www.alien.net.au/irc/irc2numerics.html
+* https://irssi.org/
