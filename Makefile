@@ -1,38 +1,50 @@
-SRCS =	main.cpp\
-		Client.cpp\
-		Command.cpp\
-		Server.cpp\
-		send_replies.cpp
+NAME = ircserv
 
-OBJS =	${SRCS:.cpp=.o}
+SRCS =	srcs/main.cpp\
+		srcs/Server.cpp\
+		srcs/Client.cpp\
+		srcs/Channel.cpp\
+		srcs/Command.cpp \
+		srcs/send_replies.cpp
 
-INCLUDES =	Client.hpp\
-			Command.hpp\
-			Server.hpp\
-			Replies.hpp
+CXX = c++
 
-CC =	c++
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g3
 
-CFLAGS = -Wall -Wextra -Werror -std=c++98 -I includes
+CPPFLAGS = -MMD -I ./includes/
 
-NAME =	server
+OBJS_DIR = ./objs/
 
-RM =	rm -rf
+OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o))
 
-%.o:	%.cpp ${INCLUDES}
-		${CC} ${CFLAGS} -c $< -o $@
+DEPS = $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.d))
 
-all:	${NAME} Makefile
 
-${NAME}:	${OBJS}	Makefile
-			${CC} ${CFLAGS} ${OBJS} -o ${NAME}
+all: $(NAME)
+	@make $(NAME) -q && echo "All OK !"
+
+$(OBJS_DIR)%.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+$(NAME): $(OBJS)
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
 clean:
-	${RM} ${OBJS}
+	rm -rf $(OBJS_DIR)
 
-fclean:		clean
-	${RM} ${NAME}
+fclean: clean
+	rm -rf $(NAME)
 
-re:			fclean all
+re: clean
+	@make all
 
-.PHONY:		all clean fclean re
+-include $(DEPS)
+
+.PHONY: all clean flean re
+
+
+
+
+
+

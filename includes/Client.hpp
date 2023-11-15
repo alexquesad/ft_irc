@@ -14,15 +14,16 @@ class Client{
 	std::string _hostname;
 	std::string _real_name;
 	// bool _is_connect;
-	// bool _is_oper;
+	bool _is_oper;
 
 	public:
 	Client(std::string nick, std::string user, std::string hostname, std::string real_name);
 	~Client();
-	std::string getNick();
-	std::string getUser();
-	std::string getHostname();
-	std::string getReal_name();
+	std::string getNick() const;
+	std::string getUser() const;
+	std::string getHostname() const;
+	std::string getReal_name() const;
+	bool getIs_oper() const;
 
 };
 

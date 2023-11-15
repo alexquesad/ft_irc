@@ -10,22 +10,27 @@ Client::Client(std::string nick, std::string user, std::string hostname, std::st
 
 Client::~Client(){}
 
-std::string Client::getNick()
+std::string Client::getNick() const
 {
     return this->_nick;
 }
 
-std::string Client::getUser()
-{
+std::string Client::getUser() const
+{ 
     return this->_user;
 }
 
-std::string Client::getHostname()
+std::string Client::getHostname() const
 {
     return this->_hostname;
 }
 
-std::string Client::getReal_name()
+std::string Client::getReal_name() const
 {
     return this->_real_name;
+}
+
+bool Client::getIs_oper() const
+{
+    return this->_is_oper;
 }
