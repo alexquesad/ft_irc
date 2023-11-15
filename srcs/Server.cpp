@@ -191,8 +191,17 @@ void Server::connectToServer()
 							//remove user to the map but how to find the nick ? Maybe replace the nick by the fd in the map
 							for (std::map<int, User*>::iterator it = this->_users.begin(); it != this->_users.end(); it++)
 							{
-								if ((*it).first == sd)
+								if (it->first == sd)
 								{
+									// pour chaque channel dans user effacer ce user dans le channel;
+									std::cout << *(it->second) << std::endl;
+									std::vector<std::string> channel_of_user = it->second->getChannels();
+									for (std::vector<std::string>::iterator itt = channel_of_user.begin(); itt != channel_of_user.end(); itt++)
+									{
+										this->_channels.find(*itt)->second->leftUser(sd);
+										if (this->_channels.find(*itt)->second->getUsersnumber() == 0)
+											this->_channels.erase(*itt);
+									}
 									this->_users.erase(it);
 									break;
 								}
@@ -290,3 +299,15 @@ std::ostream	&operator<<(std::ostream &stdout, std::map<int, User*> &users)
 	}
 	return (stdout);
 }
+
+std::ostream	&operator<<(std::ostream &stdout, User const &user)
+{
+    int i = 0;
+    std::vector<std::string> channels = user.getChannels();
+    for (std::vector<std::string>::iterator it = channels.begin(); it != channels.end(); it++, i++)
+    {
+        stdout << "Channel " << i << " of User " << user.getNick() << " is called " << *it << std::endl;
+    }
+    return (stdout);
+}
+

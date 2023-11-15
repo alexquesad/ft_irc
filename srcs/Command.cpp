@@ -21,10 +21,14 @@ void join(Server *serv, char *buffer, int sd)
 		Channel *chan = new Channel(channel_name);
     	serv->setChannels(channel_name, chan);
 	}
-    //On ajoute le client a notre serveur
-	std::cout << serv->getChannels() << std::endl;
+	//On ajoute le client a notre serveur
+    std::cout << serv->getChannels() << std::endl;
 	serv->getChannels().find(channel_name)->second->addUser(sd, serv->getUsers().find(sd)->second);
+    if (serv.getChannels().find(channel_name)->second->getUsersnumber() == 0)
+        serv->getChannels().find(channel_name)->second->addOper(sd, serv->getUsers().find(sd)->second);
+    serv->getUsers().find(sd)->second->add_channel(channel_name);
     std::cout << serv->getUsers() << std::endl;
+    std::cout << serv->getChannels().find(channel_name)->second->getUsers() << std::endl;
 }
 
 void privmsg(Server *serv, char *buffer, int sd)
