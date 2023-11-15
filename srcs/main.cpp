@@ -1,5 +1,5 @@
 #include "Server.hpp"
-#include "Client.hpp"
+#include "User.hpp"
 #include "Command.hpp"
 #include "Channel.hpp"
 #include "Replies.hpp"

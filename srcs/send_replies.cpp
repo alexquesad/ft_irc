@@ -14,7 +14,7 @@ std::string putnbr(int nb, std::string codestr)
     return (codestr);
 }
 
-std::string send_rpl_err(Server *serv, Client user, int code)
+std::string send_rpl_err(Server *serv, User user, int code)
 {
     std::string codestr;
     codestr = putnbr(code, codestr);

@@ -7,8 +7,8 @@ class Channel
 {
     private:
 
-    std::map<int, Client *> _users;
-    std::map<int, Client *> _opers;
+    std::map<int, User*> _users;
+    std::map<int, User*> _opers;
     std::string _channel_name;
     std::string _topic;
     //mode
@@ -17,14 +17,16 @@ class Channel
 
     public:
 
-    Channel(std::string channel_name, int sd, Client *user);
+    Channel(std::string channel_name);
+    Channel(const Channel &T);
+    Channel &operator=(const Channel &T);
     ~Channel();
-    std::map<int, Client *> getUsers();
+    std::map<int, User*> & getUsers();
     std::string getTopic() const;
     std::string getChannelname() const;
     int getUsersnumber() const;// if numberofuser == 0 map.erase channel
-    void addUser(int sd, Client *user);
-    void addOper(int sd, Client *user);
+    void addUser(int sd, User *user);
+    void addOper(int sd, User *user);
     void leftUser(int sd);
 };
 

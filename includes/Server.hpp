@@ -17,7 +17,7 @@
 #include <cerrno>
 #include <cstdio>
 
-#include "Client.hpp"
+#include "User.hpp"
 #include "Command.hpp"
 #include "Channel.hpp"
 #include "Replies.hpp"
@@ -39,9 +39,9 @@ class Server{
 	int _sockcom;
 	const std::string _port;
 	const std::string _password;
-	std::map<int, Client*> _users;
+	std::map<int, User*> _users;
 	std::map<std::string, command> _commandhandler;
-	std::map<std::string, Channel *> _channels;
+	std::map<std::string, Channel*> _channels;
 	struct sockaddr_in server;
 	std::string _server_name;
 
@@ -53,12 +53,18 @@ class Server{
 	void connectToServer();
 	int newSocket();
 	void sendMessage(std::string message, int sd) const;
-	std::map<std::string, Channel *> getChannels();
-	std::map<int, Client*> getUsers();
+	std::map<std::string, Channel*> & getChannels();
+	std::map<int, User*> & getUsers() ;
 	std::string receiveMessage() const;
 	std::string getServername() const;
 	std::string getPort() const;
+	void setChannels(std::string channel_name, Channel *chan);
+	void setUsers(int sd, User *user);
+	void new_connection(void);
 
 };
+
+std::ostream	&operator<<(std::ostream &stdout, std::map<std::string, Channel*> &channels);
+std::ostream	&operator<<(std::ostream &stdout, std::map<int, User*> &users);
 
 #endif

@@ -2,7 +2,7 @@ NAME = ircserv
 
 SRCS =	srcs/main.cpp\
 		srcs/Server.cpp\
-		srcs/Client.cpp\
+		srcs/User.cpp\
 		srcs/Channel.cpp\
 		srcs/Command.cpp \
 		srcs/send_replies.cpp
