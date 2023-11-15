@@ -283,12 +283,12 @@ std::string Server::getPort() const
 	return this->_port;
 }
 
-std::map<std::string, Channel *> Server::getChannels() const
+std::map<std::string, Channel *> Server::getChannels()
 {
 	return this->_channels;
 }
 
-std::map<int, Client *> Server::getUsers() const
+std::map<int, Client *> Server::getUsers()
 {
 	return this->_users;
 }

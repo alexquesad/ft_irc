@@ -19,7 +19,7 @@ class Channel
 
     Channel(std::string channel_name, int sd, Client *user);
     ~Channel();
-    std::map<int, Client *> getUsers() const;
+    std::map<int, Client *> getUsers();
     std::string getTopic() const;
     std::string getChannelname() const;
     int getUsersnumber() const;// if numberofuser == 0 map.erase channel

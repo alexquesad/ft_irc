@@ -2,7 +2,7 @@
 
 Channel::Channel(std::string channel_name, int sd, Client *user) : _channel_name(channel_name), _topic()
 {
-    addUser(sd, user);
+    //addUser(sd, user);
     addOper(sd, user);
 }
 
@@ -23,7 +23,7 @@ std::string Channel::getChannelname() const
     return this->_channel_name;
 }
 
-std::map<int, Client *> Channel::getUsers() const
+std::map<int, Client *> Channel::getUsers()
 {
     return this->_users;
 }

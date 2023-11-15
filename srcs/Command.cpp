@@ -5,7 +5,7 @@
 void nick(Server *serv, char *buffer, int sd)
 {
     (void)serv;
-    (void) buffer;
+    (void)buffer;
     (void)sd;
     std::cout << "test1" << std::endl;
 }
@@ -18,17 +18,16 @@ void join(Server *serv, char *buffer, int sd)
     for (; buf[5 + i] && buf[5 + i] != ' ' && buf[5 + i] != '\r' && buf[5 + i] != '\n';i++);
     std::string channel_name(buf.substr(5, i));
     std::cout << "channel_name : " << channel_name << "lol" << std::endl;
-    Channel new_channel(channel_name, sd, serv->getUsers().find(sd)->second);
-    std::cout << new_channel.getChannelname() << std::endl;
-    std::pair<std::map<std::string, Channel *>::iterator,bool> ret;
-    ret = serv->getChannels().insert(std::make_pair(channel_name, &new_channel));
-    // if (ret.second == true)
-    // {
-    //     std::cout << "ntm" << std::endl;
-    // }
-    // std::cout << "ret : " << ret.first << " " << ret.second << std::endl;
-    serv->sendMessage("#funfunfun test", sd);
-    // std::cout << serv->getChannels().size() << std::endl; // return 0 (should be 1, didnt inserted well)
+    if (serv->getChannels().find(channel_name) == serv->getChannels().end()) // si le channel n'existe pas on le cree et on l'ajoute a notre map de channel
+	{
+		Channel new_channel(channel_name, sd, serv->getUsers().find(sd)->second);
+    	std::cout << new_channel.getChannelname() << std::endl;
+    	serv->getChannels().insert(std::make_pair(channel_name, &new_channel));
+	}
+    //On ajoute le client a notre serveur
+	Channel *channel = serv->getChannels().find(channel_name)->second;
+	Client *user = serv->getUsers().find(sd)->second; // retour de find semble etre end --> user pas trouve
+	channel->addUser(sd, user); //segfault mais on doit ajouter le user a la liste ici
 }
 
 void privmsg(Server *serv, char *buffer, int sd)
@@ -41,15 +40,14 @@ void privmsg(Server *serv, char *buffer, int sd)
     std::cout << "channel_name : " << channel_name << "lol" << std::endl;
     std::map<std::string, Channel *> channels = serv->getChannels();
     std::map<std::string, Channel *>::iterator test =  channels.find(channel_name);
-    if (test == channels.end())
-        std::cout << "ntm" << std::endl;
+    std::cout << "hiiiiiiiiii : " << test->first << std::endl; //si on retire ce print ca segfault (sur mac en tout cas)
     Channel *channel = test->second;
-    // std::cout << "buffer : " << &buffer[8] << std::endl;
-
     std::map<int, Client *> users = channel->getUsers();
+    std::cout << channel->getUsersnumber() << std::endl;
     std::map<int, Client*>::iterator end = users.end();
     for (std::map<int, Client*>::iterator it = users.begin(); it != end; it++)
-    {
+    {   
+        //std::cout << "hi" << std::endl;
         if (sd != it->first)
             serv->sendMessage(buffer, it->first);
     }
