@@ -8,7 +8,8 @@ SRCS =	srcs/main.cpp\
 		srcs/send_replies.cpp\
 		srcs/utils.cpp\
 		srcs/send.cpp\
-		srcs/cmds/NICK.cpp
+		srcs/cmds/NICK.cpp\
+		srcs/cmds/JOIN.cpp
 
 CXX = c++
 

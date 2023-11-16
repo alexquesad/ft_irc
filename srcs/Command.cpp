@@ -1,32 +1,5 @@
 #include "main.hpp"
 
-void join(Server *serv, char *buffer, int sd)
-{
-    int i = 0;
-    std::string buf(buffer);
-    for (; buf[5 + i] && buf[5 + i] != ' ' && buf[5 + i] != '\r' && buf[5 + i] != '\n';i++);
-    std::string channel_name(buf.substr(5, i));
-    if (serv->getChannels().find(channel_name) == serv->getChannels().end()) // si le channel n'existe pas on le cree et on l'ajoute a notre map de channel
-	{
-		Channel *chan = new Channel(channel_name);
-    	serv->setChannels(channel_name, chan);
-	}
-	//On ajoute le client a notre serveur
-    if (serv->getChannels().find(channel_name)->second->getUsersnumber() == 0)
-        serv->getChannels().find(channel_name)->second->addOper(sd, serv->getUsers().find(sd)->second);
-    else
-	    serv->getChannels().find(channel_name)->second->addUser(sd, serv->getUsers().find(sd)->second);
-    serv->getUsers().find(sd)->second->add_channel(channel_name);
-    std::string user_answer = user_output(serv->getUsers().find(sd)->second);
-    user_answer += buffer;
-    sendEveryone(user_answer, serv->getChannels().find(channel_name)->second);
-    sendMessage(send_rpl_err(332, serv, serv->getUsers().find(sd)->second, channel_name, ""), sd);
-    std::string list_of_user = serv->getChannels().find(channel_name)->second->get_list_of_user_in_chan();
-    std::cout << list_of_user << std::endl;
-    sendMessage(send_rpl_err(353, serv, serv->getUsers().find(sd)->second, channel_name, list_of_user), sd);
-    sendMessage(send_rpl_err(366, serv, serv->getUsers().find(sd)->second, channel_name, ""), sd);
-}
-
 void privmsg(Server *serv, char *buffer, int sd)
 {
     std::cout << buffer << std::endl;
