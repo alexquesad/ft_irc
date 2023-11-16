@@ -3,7 +3,7 @@
 bool nickname_is_valid(std::string nick)
 {
     std::string letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    std::string special = "[]\\'_^{|}";
+    std::string special = "[]\\`_^{|}";
     std::string digit = "0123456789";
     std::string minus = "-";
     std::string first_char = letter + special;

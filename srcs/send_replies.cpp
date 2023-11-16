@@ -10,8 +10,12 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
     else if (code < 100)
         codestr.insert(0, 1, '0');
 
-    std::string ret(":" + serv->getServername() + " " + codestr + " " + user->getNickname() + " ");
+    std::string ret;
 
+    if (user)
+        ret += ":" + serv->getServername() + " " + codestr + " " + user->getNickname() + " ";
+    else
+        ret += ":" + serv->getServername() + " " + codestr + " " + args + " ";
     switch (code)
     {
         case 001:

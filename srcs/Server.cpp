@@ -51,6 +51,7 @@ void Server::new_connection(void)
 	//send new connection greeting message
 	size_t occ;
 	bool is_pass_good = false;
+	bool is_nick_good = true;
 	std::string nick, user, host, server_name, real_name, pass, buffer;
 	do
 	{
@@ -76,9 +77,17 @@ void Server::new_connection(void)
 		}
 		// split buffer to stock informations : std::string ret(split(buffer.c_str(), " "))
 		if ((occ = ret.find("NICK")) != std::string::npos)
+		{
 			//nickname
 			for (int i = 0;ret[occ + 5 + i] && ret[occ + 5 + i] != ' ' && ret[occ + 5 + i] != '\n' && ret[occ + 5 + i] != '\r'; i++)
 				nick += ret[occ + 5 + i];
+			if (nickname_is_in_use(this, nick))
+			{
+				sendMessage(send_rpl_err(433, this, NULL, nick, ""), this->_sockcom);
+				is_nick_good = false;
+				break;
+			}		
+		}
 		if ((occ = ret.find("USER")) != std::string::npos)
 		{
 			int i = 0;
@@ -98,7 +107,7 @@ void Server::new_connection(void)
 		}
 	}
 	while (ret.find("USER") == std::string::npos);
-	if (is_pass_good == true && _users.size() < 10)
+	if (is_pass_good == true && _users.size() < 10 && is_nick_good == true)
 	{
 		this->_server_name = server_name;
 		User *new_user = new User(nick, user, host, real_name);
@@ -121,8 +130,8 @@ void Server::new_connection(void)
 			}
 		}
 	}
-	else if (is_pass_good == true)
-		sendMessage(send_rpl_err(005, this, NULL, "", ""), this->_sockcom);
+	else if (is_pass_good == true && is_nick_good == true)
+		sendMessage(send_rpl_err(005, this, NULL, nick, ""), this->_sockcom);
 }
 
 void Server::connectToServer()
