@@ -1,4 +1,4 @@
-#include "Channel.hpp"
+#include "main.hpp"
 
 Channel::Channel(std::string channel_name) : _channel_name(channel_name), _topic(){
 }
@@ -36,7 +36,7 @@ Channel::~Channel(){}
 
 int Channel::getUsersnumber() const
 {
-    return this->_users.size();
+    return (this->_users.size() + this->_opers.size());
 }
 
 std::string Channel::getTopic() const
@@ -46,7 +46,7 @@ std::string Channel::getTopic() const
 
 std::string Channel::getChannelname() const
 {
-    std::cout << "good" << std::endl;
+    std::cout << "bon" << std::endl;
     if (this->_channel_name.empty())
         std::cout << this->_channel_name << std::endl;
     return this->_channel_name;
@@ -55,6 +55,11 @@ std::string Channel::getChannelname() const
 std::map<int, User*> & Channel::getUsers()
 {
     return this->_users;
+}
+
+std::map<int, User*> & Channel::getOpers()
+{
+    return this->_opers;
 }
 
 void Channel::addUser(int sd, User *user)
@@ -71,9 +76,26 @@ void Channel::leftUser(int sd)
 {
     std::map<int, User*>::iterator it;
     if ((it = this->_users.find(sd)) != this->_users.end())
-    {
         this->_users.erase(it);
-        if ((it = this->_opers.find(sd)) != this->_opers.end())
-            this->_opers.erase(it);
+    else if ((it = this->_opers.find(sd)) != this->_opers.end())
+        this->_opers.erase(it);
+}
+
+std::string Channel::get_list_of_user_in_chan()
+{
+    std::string output;
+    for (std::map<int, User *>::iterator it = this->_opers.begin(); it != this->_opers.end(); it++)
+    {
+        if (!output.empty())
+            output += " ";
+        output += "@";
+        output += it->second->getNickname();
     }
+    for (std::map<int, User *>::iterator it = this->_users.begin(); it != this->_users.end(); it++)
+    {
+        if (!output.empty())
+            output += " ";
+        output += it->second->getNickname();
+    }
+    return (output);
 }

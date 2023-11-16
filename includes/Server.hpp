@@ -1,32 +1,9 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <unistd.h>
-#include <fcntl.h>
-#include <poll.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <map>
-#include <vector>
-#include <cstring>
-#include <cstdlib>
-#include <cerrno>
-#include <cstdio>
+#include "main.hpp"
 
-#include "User.hpp"
-#include "Command.hpp"
-#include "Channel.hpp"
-#include "Replies.hpp"
-#include "utils.hpp"
-
-# define SERVER_NAME "localhost"
-# define ver "1.0"
-
-class Channel;
+class User;
 
 class Server{
 	public:
@@ -52,7 +29,6 @@ class Server{
 	~Server();
 	void connectToServer();
 	int newSocket();
-	void sendMessage(std::string message, int sd) const;
 	std::map<std::string, Channel*> & getChannels();
 	std::map<int, User*> & getUsers() ;
 	std::string receiveMessage() const;

@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "main.hpp"
 
 #define max_clients 10
 
@@ -17,30 +17,23 @@ Server::Server(const std::string &port, const std::string &password) : _port(por
 Server::~Server(){close(this->_sockserver);}
 
 int Server::newSocket()
-{   
-    // Create a new socket using IPv4 addressing and TCP protocol
+{
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock < 0)
 		throw std::runtime_error("Error creating socket.\n");
 	int tmp = 1;
-    // Set socket options to allow reuse of the address
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &tmp, sizeof(tmp)))
 		throw std::runtime_error("Error while setting up socket.\n");
-    // Set the socket to non-blocking mode
 	if (fcntl(sock, F_SETFL, O_NONBLOCK) == -1)
 		throw std::runtime_error("Error while setting socket NON-BLOCKING mode.\n");
-    // Set up the server address structure
 	server.sin_addr.s_addr = INADDR_ANY;
 	server.sin_port = htons(static_cast<unsigned short>(std::strtoul(this->_port.c_str(), NULL, 0)));
 	server.sin_family = AF_INET;
-    // Bind the socket to the specified address and port
 	if (bind(sock, (const struct sockaddr*)&server, sizeof(server)) < 0)
 		throw std::runtime_error("Error binding socket.\n");
-    // Start listening on the socket with a backlog queue of 10 connections
 	if (listen(sock, 10) < 0)
 		throw std::runtime_error("Error listening on socket.\n");
-    // Print a message indicating that the server is ready to accept connections
-	std::cout << "Ready to accept connections..." << std::endl;
+	std::cout << "accept" << std::endl;
 	return sock;
 }
 
@@ -53,7 +46,7 @@ void Server::new_connection(void)
 		exit(EXIT_FAILURE);
 	}
 	//inform user of socket number - used in send and receive commands
-	std::cout << "New connection , socket fd is" << this->_sockcom << " , ip is : " << inet_ntoa(server.sin_addr) << " , port : " <<  ntohs(server.sin_port) << std::endl;
+	std::cout << "New connection , socket fd is " << this->_sockcom << " , ip is : " << inet_ntoa(server.sin_addr) << " , port : " <<  ntohs(server.sin_port) << std::endl;
 	std::string ret;
 	//send new connection greeting message
 	size_t occ;
@@ -112,10 +105,10 @@ void Server::new_connection(void)
 		this->setUsers(this->_sockcom, new_user);
 		std::cout << "number of user connected to the server: " << this->_users.size() << std::endl;
 		// sendMessage("001 " + nick + " :Welcome to the Internet Relay Network " + nick + "!" + user + "@" + host);
-		sendMessage(send_rpl_err(this, *new_user, 001), this->_sockcom);
-		sendMessage(send_rpl_err(this, *new_user, 002), this->_sockcom);
-		sendMessage(send_rpl_err(this, *new_user, 003), this->_sockcom);
-		sendMessage(send_rpl_err(this, *new_user, 004), this->_sockcom);
+		sendMessage(send_rpl_err(001, this, new_user, "", ""), this->_sockcom);
+		sendMessage(send_rpl_err(002, this, new_user, "", ""), this->_sockcom);
+		sendMessage(send_rpl_err(003, this, new_user, "", ""), this->_sockcom);
+		sendMessage(send_rpl_err(004, this, new_user, "", ""), this->_sockcom);
 		//add new socket to array of sockets
 		for (int i = 0; i < max_clients; i++)
 		{
@@ -129,7 +122,7 @@ void Server::new_connection(void)
 		}
 	}
 	else if (is_pass_good == true)
-		sendMessage("005 " + nick + " :Try server " + server_name + ", port 6667", this->_sockcom);
+		sendMessage(send_rpl_err(005, this, NULL, "", ""), this->_sockcom);
 }
 
 void Server::connectToServer()
@@ -194,7 +187,6 @@ void Server::connectToServer()
 								if (it->first == sd)
 								{
 									// pour chaque channel dans user effacer ce user dans le channel;
-									std::cout << *(it->second) << std::endl;
 									std::vector<std::string> channel_of_user = it->second->getChannels();
 									for (std::vector<std::string>::iterator itt = channel_of_user.begin(); itt != channel_of_user.end(); itt++)
 									{
@@ -203,6 +195,7 @@ void Server::connectToServer()
 											this->_channels.erase(*itt);
 									}
 									this->_users.erase(it);
+									// delete it->second;
 									break;
 								}
 							}
@@ -216,7 +209,7 @@ void Server::connectToServer()
 						{
 							std::string command(buffer);
 							command = command.substr(0, command.find(' '));
-							std::cout << "MY NICK: " << command << std::endl;
+							// std::cout << "MY NICK: " << command << std::endl;
 							if (_commandhandler.find(command) != _commandhandler.end())
 								(_commandhandler[command])(this, buffer, sd);
 							break;
@@ -229,13 +222,6 @@ void Server::connectToServer()
 	close(this->_sockserver);
 }
 
-void Server::sendMessage(std::string message, int sd) const
-{
-	message += "\r\n";
-	if (send(sd, message.c_str(), message.length(), 0) < 0)
-		throw std::runtime_error("Error sending message.");
-}
-
 std::string Server::receiveMessage() const
 {
 	char buffer[1024];
@@ -245,7 +231,7 @@ std::string Server::receiveMessage() const
 		std::cout << strerror(errno) << std::endl;
 		throw std::runtime_error("Error receiving message");
 	}
-	std::cout << "BUFFER : " << buffer << "]\n";
+	// std::cout << "BUFFER : " << buffer << "]\n";
 	message = buffer;
 	return message;
 }
@@ -295,7 +281,7 @@ std::ostream	&operator<<(std::ostream &stdout, std::map<int, User*> &users)
 	int i = 0;
 	for (std::map<int, User*>::iterator it = users.begin(); it != users.end(); it++, i++)
 	{
-		stdout << "User " << i << " nick is " << it->second->getNick() << "." << std::endl;
+		stdout << "User " << i << " nick is " << it->second->getNickname() << "." << std::endl;
 	}
 	return (stdout);
 }
@@ -306,8 +292,7 @@ std::ostream	&operator<<(std::ostream &stdout, User const &user)
     std::vector<std::string> channels = user.getChannels();
     for (std::vector<std::string>::iterator it = channels.begin(); it != channels.end(); it++, i++)
     {
-        stdout << "Channel " << i << " of User " << user.getNick() << " is called " << *it << std::endl;
+        stdout << "Channel " << i << " of User " << user.getNickname() << " is called " << *it << std::endl;
     }
     return (stdout);
 }
-

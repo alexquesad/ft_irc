@@ -1,9 +1,4 @@
-#include "Server.hpp"
-#include "User.hpp"
-#include "Command.hpp"
-#include "Channel.hpp"
-#include "Replies.hpp"
-#include "utils.hpp"
+#include "main.hpp"
 
 int main(int ac, char **av)
 {
@@ -20,14 +15,14 @@ int main(int ac, char **av)
 		return 1;
 	}
 	// Send login information
-	// server.sendMessage("NICK mynick\r\n");
-	// server.sendMessage("USER myuser 0 * :My Name\r\n");
+	// sendMessage("NICK mynick\r\n");
+	// sendMessage("USER myuser 0 * :My Name\r\n");
 
 	// // Join a channel
-	// server.sendMessage("JOIN #mychannel\r\n");
+	// sendMessage("JOIN #mychannel\r\n");
 
 	// // Send a message to the channel
-	// server.sendMessage("PRIVMSG #mychannel :Hello, world!\r\n");
+	// sendMessage("PRIVMSG #mychannel :Hello, world!\r\n");
 	// while(true)
 	// {
 	// 	std::cout << server.receiveMessage() << "\n" << std::endl;

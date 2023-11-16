@@ -1,14 +1,11 @@
-#ifndef REPLIES_HPP
-# define REPLIES_HPP
+#ifndef RPL_ERR_HPP
+# define RPL_ERR_HPP
 
-#include "Server.hpp"
-#include "User.hpp"
+#include "main.hpp"
 
-class Server;
+std::string send_rpl_err(int code, Server *serv, User *user, std::string args, std::string args2);
 
-std::string send_rpl_err(Server *serv, User user, int code);
-
-//REPLIES
+//RPL
 
 //001
 # define RPL_WELCOME(nick, user, host) \
@@ -39,48 +36,48 @@ std::string send_rpl_err(Server *serv, User user, int code);
     (name + " :End of WHO list")
 
 //322
-# define RPL_LIST \
-    ("<channel> <# visible> :<topic>")
+# define RPL_LIST(channel) \
+    (channel +" <# visible> :<topic>")
 
 //323
 # define RPL_LISTEND \
     (":End of LIST")
 
 //324
-# define RPL_CHANNELMODEIS \
-    ("<channel> <mode> <mode params>")
+# define RPL_CHANNELMODEIS(channel) \
+    (channel + " <mode> <mode params>")
 
 //331
-# define RPL_NOTOPIC \
-    ("<channel> :No topic is set")
+# define RPL_NOTOPIC(channel) \
+    (channel + " :No topic is set")
 
 //332
-# define RPL_TOPIC \
-    ("<channel> :<topic>")
+# define RPL_TOPIC(channel) \
+    (channel + " :<topic>")
 
 //341
-# define RPL_INVITING(nick) \
-    ("<channel> " + nick)
+# define RPL_INVITING(channel, nick) \
+    (channel + " " + nick)
 
 //351
 # define RPL_VERSION \
     (ver ".<debuglevel> " SERVER_NAME " :<comments>")
 
 //353
-# define RPL_NAMREPLY \
-    (" = <channel> :")
+# define RPL_NAMREPLY(channel, list_of_users) \
+    ("= " + channel + " :" + list_of_users)
 
 //366
-# define RPL_ENDOFNAMES \
-    ("<channel> :End of NAMES list")
+# define RPL_ENDOFNAMES(channel) \
+    (channel + " :End of NAMES list")
 
 //367
-# define RPL_BANLIST \
-    ("<channel> <banmask>")
+# define RPL_BANLIST(channel) \
+    (channel + " <banmask>")
 
 //368
-# define RPL_ENDOFBANLIST \
-    ("<channel> :End of channel ban list")
+# define RPL_ENDOFBANLIST(channel) \
+    (channel + " :End of channel ban list")
 
 //372
 # define RPL_MOTD \
@@ -98,7 +95,7 @@ std::string send_rpl_err(Server *serv, User user, int code);
 # define RPL_YOUREOPER \
     (":You are now an IRC operator")
 
-//ERRORS
+//ERR
 
 //401
 # define ERR_NOSUCHNICK(nick) \
@@ -109,12 +106,12 @@ std::string send_rpl_err(Server *serv, User user, int code);
     (SERVER_NAME " :No such server")
 
 //403
-# define ERR_NOSUCHCHANNEL \
-    ("<channel name> :No such channel")
+# define ERR_NOSUCHCHANNEL(channel) \
+    (channel + " :No such channel")
 
 //404
-# define ERR_CANNOTSENDTOCHAN \
-    ("<channel name> :Cannot send to channel")
+# define ERR_CANNOTSENDTOCHAN(channel) \
+    (channel + " :Cannot send to channel")
 
 //411
 # define ERR_NORECIPIENT \
@@ -153,24 +150,24 @@ std::string send_rpl_err(Server *serv, User user, int code);
     (nick + " :Nickname is already in use")
 
 //441
-# define ERR_USERNOTINCHANNEL(nick) \
-    (nick + " <channel> :They aren't on that channel")
+# define ERR_USERNOTINCHANNEL(nick, channel) \
+    (nick + " " + channel " :They aren't on that channel")
 
 //442
-# define ERR_NOTONCHANNEL \
-    ("<channel> :You're not on that channel")
+# define ERR_NOTONCHANNEL(channel) \
+    (channel + " :You're not on that channel")
 
 //443
-# define ERR_USERONCHANNEL(user) \
-    (user +  "<channel> :is already on channel")
+# define ERR_USERONCHANNEL(user, channel) \
+    (user + " " + channel " :is already on channel")
 
 //451
 # define ERR_NOTREGISTERED \
     (":You have not registered")
 
 //461
-# define ERR_NEEDMOREPARAMS \
-    ("<command> :Not enough parameters")
+# define ERR_NEEDMOREPARAMS(command) \
+    (command + " :Not enough parameters")
 
 //462
 # define ERR_ALREADYREGISTRED \
@@ -181,36 +178,36 @@ std::string send_rpl_err(Server *serv, User user, int code);
     (":Password incorrect")
 
 //467
-# define ERR_KEYSET \
-    ("<channel> :Channel key already set")
+# define ERR_KEYSET(channel) \
+    (channel + " :Channel key already set")
 
 //471
-# define ERR_CHANNELISFULL \
-    ("<channel> :Cannot join channel (+l)")
+# define ERR_CHANNELISFULL(channel) \
+    (channel + " :Cannot join channel (+l)")
 
 //472
-# define ERR_UNKNOWNMODE \
-    ("<char> :is unknown mode char to me for <channel>")
+# define ERR_UNKNOWNMODE(channel) \
+    ("<char> :is unknown mode char to me for " + channel)
 
 //473
-# define ERR_INVITEONLYCHAN \
-    ("<channel> :Cannot join channel (+i)")
+# define ERR_INVITEONLYCHAN(channel) \
+    (channel + " :Cannot join channel (+i)")
 
 //474
-# define ERR_BANNEDFROMCHAN \
-    ("<channel> :Cannot join channel (+b)")
+# define ERR_BANNEDFROMCHAN(channel) \
+    (channel + " :Cannot join channel (+b)")
 
 //475
-# define ERR_BADCHANNELKEY \
-    ("<channel> :Cannot join channel (+k)")
+# define ERR_BADCHANNELKEY(channel) \
+    (channel + " :Cannot join channel (+k)")
 
 //476
-# define ERR_BADCHANMASK \
-    ("<channel> :Bad Channel Mask")
+# define ERR_BADCHANMASK(channel) \
+    (channel + " :Bad Channel Mask")
 
 //482
-# define ERR_CHANOPRIVSNEEDED \
-    ("<channel> :You're not channel operator")
+# define ERR_CHANOPRIVSNEEDED(channel) \
+    (channel + " :You're not channel operator")
 
 //501
 # define ERR_UMODEUNKNOWNFLAG \

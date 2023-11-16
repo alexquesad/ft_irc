@@ -1,7 +1,7 @@
 #ifndef COMMAND_HPP
 # define COMMAND_HPP
 
-# include "Server.hpp"
+#include "main.hpp"
 
 class Server;
 

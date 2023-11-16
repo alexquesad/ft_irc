@@ -1,19 +1,16 @@
-#include "User.hpp"
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
+#include "main.hpp"
 
 int max_clients = 10;
 
-User::User(std::string nick, std::string user, std::string hostname, std::string real_name) : _nick(nick), _user(user), _hostname(hostname), _real_name(real_name){
+User::User(std::string nickname, std::string username, std::string hostname, std::string real_name) : _nickname(nickname), _username(username), _hostname(hostname), _real_name(real_name){
 }
 
 User &User::operator=(const User &T)
 {
     if (this == &T)
         return (*this);
-    this->_nick = T._nick;
-    this->_user = T._user;
+    this->_nickname = T._nickname;
+    this->_username = T._username;
     this->_hostname = T._hostname;
     this->_real_name = T._real_name;
     return (*this);
@@ -27,14 +24,14 @@ User::User(const User &T)
 
 User::~User(){}
 
-std::string User::getNick() const
+std::string User::getNickname() const
 {
-    return this->_nick;
+    return this->_nickname;
 }
 
-std::string User::getUser() const
+std::string User::getUsername() const
 { 
-    return this->_user;
+    return this->_username;
 }
 
 std::string User::getHostname() const
@@ -59,19 +56,7 @@ void User::add_channel(std::string channel_name)
         this->_channels.push_back(channel_name);
 }
 
-
-// bool User::getIs_oper() const
-// {
-//     return this->_is_oper;
-// }
-
-// std::ostream	&operator<<(std::ostream &stdout, User const &user)
-// {
-//     int i = 0;
-//     std::vector<std::string> channels = user.getChannels();
-//     for (std::vector<std::string>::iterator it = channels.begin(); it != channels.end(); it++, i++)
-//     {
-//         stdout << "Channel " << i << "of User " << user.getNick() << " is called " << *it;
-//     }
-//     return (stdout);
-// }
+void User::setNick(std::string new_nickname)
+{
+    this->_nickname = new_nickname;
+}

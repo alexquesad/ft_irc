@@ -5,7 +5,10 @@ SRCS =	srcs/main.cpp\
 		srcs/User.cpp\
 		srcs/Channel.cpp\
 		srcs/Command.cpp \
-		srcs/send_replies.cpp
+		srcs/send_replies.cpp\
+		srcs/utils.cpp\
+		srcs/send.cpp\
+		srcs/cmds/NICK.cpp
 
 CXX = c++
 
