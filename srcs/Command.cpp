@@ -1,28 +1,5 @@
 #include "main.hpp"
 
-void privmsg(Server *serv, char *buffer, int sd)
-{
-    std::cout << buffer << std::endl;
-    int i = 0;
-    std::string buf(buffer);
-    for (; buf[8 + i] && buf[8 + i] != ' ' && buf[8 + i] != '\r' && buf[8 + i] != '\n';i++);
-    std::string channel_name(buf.substr(8, i));
-    std::cout << "channel_name : " << channel_name << "lol" << std::endl;
-    std::map<std::string, Channel*> channels = serv->getChannels();
-	std::map<std::string, Channel*>::iterator test =  channels.find(channel_name);
-	std::cout << "hihihihi : " << test->first << std::endl; //si on retire ce print ca segfault (sur mac en tout cas)
-	Channel *channel = test->second;
-    std::map<int, User*> users = channel->getUsers();
-	std::cout << channel->getUsersnumber() << std::endl;
-    std::map<int, User*>::iterator end = users.end();
-	for (std::map<int, User*>::iterator it = users.begin(); it != end; it++)
-    {
-		//std::cout << "yo" << std::endl;
-        if (sd != it->first)
-            sendMessage(buffer, it->first);
-    }
-}
-
 // void ping(Server *serv, char *buffer, int sd)
 // {
 //     buffer[1] = 'O';

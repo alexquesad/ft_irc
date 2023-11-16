@@ -18,3 +18,17 @@ void sendEveryone(std::string message, Channel *chan)
         sendMessage(message, it->first);
     }
 }
+
+void sendEveryone(std::string message, Channel *chan, int sd)
+{
+    for (std::map<int, User *>::iterator it = chan->getUsers().begin(); it != chan->getUsers().end(); it++)
+    {
+        if (sd != it->first)
+            sendMessage(message, it->first);
+    }
+    for (std::map<int, User *>::iterator it = chan->getOpers().begin(); it != chan->getOpers().end(); it++)
+    {
+        if (sd != it->first)
+            sendMessage(message, it->first);
+    }
+}
