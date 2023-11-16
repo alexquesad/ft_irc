@@ -110,15 +110,15 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
         // case 422:
         //     ret += ERR_NOMOTD;
 		// 	break;
-        // case 431:
-        //     ret += ERR_NONICKNAMEGIVEN;
-		// 	break;
+        case 431:
+            ret += ERR_NONICKNAMEGIVEN;
+			break;
         case 432:
             ret += ERR_ERRONEUSNICKNAME(args);
 			break;
-        // case 433:
-        //     ret += ERR_NICKNAMEINUSE(user->getNickname());
-		// 	break;
+        case 433:
+            ret += ERR_NICKNAMEINUSE(args);
+			break;
         // case 441:
         //     ret += ERR_USERNOTINCHANNEL(user->getNickname());
 		// 	break;
