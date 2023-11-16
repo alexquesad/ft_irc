@@ -46,11 +46,11 @@ void join(Server *serv, char *buffer, int sd)
         std::string channel_name = channels_name.substr(0, channels_name.find(","));
         channels_name.erase(0, channels_name.find(",") + 1);
 
-        if (serv->getChannels().find(channel_name) == serv->getChannels().end()) // si le channel n'existe pas on le cree et on l'ajoute a notre map de channel
-        {
-            Channel *chan = new Channel(channel_name);
-            serv->setChannels(channel_name, chan);
-        }
+        // if (serv->getChannels().find(channel_name) == serv->getChannels().end()) // si le channel n'existe pas on le cree et on l'ajoute a notre map de channel
+        // {
+        Channel *chan = new Channel(channel_name);
+        serv->setChannels(channel_name, chan);
+        // }
         //On ajoute le client a notre serveur
         if (serv->getChannels().find(channel_name)->second->getUsersnumber() == 0)
             serv->getChannels().find(channel_name)->second->addOper(sd, serv->getUsers().find(sd)->second);
@@ -60,7 +60,13 @@ void join(Server *serv, char *buffer, int sd)
         std::string user_answer = user_output(serv->getUsers().find(sd)->second);
         user_answer += buffer;
         sendEveryone(user_answer, serv->getChannels().find(channel_name)->second);
-        sendMessage(send_rpl_err(332, serv, serv->getUsers().find(sd)->second, channel_name, ""), sd);
+        if (serv->getChannels().find(channel_name)->second->getTopic() == "")
+        {
+            sendMessage(send_rpl_err(331, serv, serv->getUsers().find(sd)->second, channel_name, ""), sd);
+            std::cout << "test" << std::endl;
+        }
+        else
+            sendMessage(send_rpl_err(332, serv, serv->getUsers().find(sd)->second, channel_name, serv->getChannels().find(channel_name)->second->getTopic()), sd);
         std::string list_of_user = serv->getChannels().find(channel_name)->second->get_list_of_user_in_chan();
         sendMessage(send_rpl_err(353, serv, serv->getUsers().find(sd)->second, channel_name, list_of_user), sd);
         sendMessage(send_rpl_err(366, serv, serv->getUsers().find(sd)->second, channel_name, ""), sd);

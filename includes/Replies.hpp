@@ -52,8 +52,8 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
     (channel + " :No topic is set")
 
 //332
-# define RPL_TOPIC(channel) \
-    (channel + " :<topic>")
+# define RPL_TOPIC(channel, topic) \
+    (channel + " :" + topic)
 
 //341
 # define RPL_INVITING(channel, nick) \

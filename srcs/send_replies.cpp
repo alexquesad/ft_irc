@@ -15,7 +15,7 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
     if (user)
         ret += ":" + serv->getServername() + " " + codestr + " " + user->getNickname() + " ";
     else
-        ret += ":" + serv->getServername() + " " + codestr + " " + args + " ";
+        ret += ":" + serv->getServername() + " " + codestr + " " + "*" + " ";
     switch (code)
     {
         case 001:
@@ -48,11 +48,11 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
         // case 324:
         //     ret += RPL_CHANNELMODEIS;
 		// 	break;
-        // case 331:
-        //     ret += RPL_NOTOPIC;
-		// 	break;
+        case 331:
+            ret += RPL_NOTOPIC(args);
+			break;
         case 332:
-            ret += RPL_TOPIC(args);
+            ret += RPL_TOPIC(args, args2);
 			break;
         // case 341:
         //     ret += RPL_INVITING(user->getNickname());

@@ -10,7 +10,10 @@ SRCS =	srcs/main.cpp\
 		srcs/send.cpp\
 		srcs/cmds/NICK.cpp\
 		srcs/cmds/JOIN.cpp\
-		srcs/cmds/PRIVMSG.cpp
+		srcs/cmds/PRIVMSG.cpp\
+		srcs/cmds/PART.cpp\
+		srcs/cmds/PINGPONG.cpp\
+		srcs/cmds/TOPIC.cpp
 
 CXX = c++
 

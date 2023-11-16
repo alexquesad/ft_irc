@@ -1,35 +1,6 @@
 #include "main.hpp"
 
-Channel::Channel(std::string channel_name) : _channel_name(channel_name), _topic(){
-}
-
-Channel &Channel::operator=(const Channel &T)
-{
-    if (this == &T)
-        return (*this);
-    while (!this->_users.empty())
-    {
-        this->_users.erase(this->_users.begin());
-    }
-    if (T._users.begin() != T._users.end())
-        this->_users.insert(T._users.begin(), T._users.end());
-    while (!this->_opers.empty())
-    {
-        this->_opers.erase(this->_opers.begin());
-    }
-    if (T._opers.begin() != T._opers.end())
-        this->_opers.insert(T._opers.begin(), T._opers.end());
-    std::cout << "use of this" << std::endl;
-    this->_channel_name = T._channel_name;
-    this->_topic = T._topic;
-    return (*this);
-}
-
-Channel::Channel(const Channel &T)
-{
-	*this = T;
-    std::cout << "yo" << std::endl;
-	return ;
+Channel::Channel(std::string channel_name) : _channel_name(channel_name), _topic(""){
 }
 
 Channel::~Channel(){}
@@ -42,6 +13,11 @@ int Channel::getUsersnumber() const
 std::string Channel::getTopic() const
 {
     return this->_topic;
+}
+
+void Channel::setTopic(std::string topic)
+{
+    this->_topic = topic;
 }
 
 std::string Channel::getChannelname() const

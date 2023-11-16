@@ -8,7 +8,10 @@ class Server;
 void nick(Server *serv, char *buffer, int sd);
 void join(Server *serv, char *buffer, int sd);
 void privmsg(Server *serv, char *buffer, int sd);
-// void ping(Server *serv, char *buffer, int sd);
-// void pong(Server *serv, char *buffer, int sd);
+void ping(Server *serv, char *buffer, int sd);
+void pong(Server *serv, char *buffer, int sd);
+void part(Server *serv, char *buffer, int sd);
+void topic(Server *serv, char *buffer, int sd);
+
 
 #endif

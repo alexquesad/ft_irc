@@ -42,7 +42,7 @@ class Server{
 
 std::ostream	&operator<<(std::ostream &stdout, std::map<std::string, Channel*> &channels);
 std::ostream	&operator<<(std::ostream &stdout, std::map<int, User*> &users);
-std::ostream	&operator<<(std::ostream &stdout, User const &user);
+std::ostream	&operator<<(std::ostream &stdout, User &user);
 
 
 #endif

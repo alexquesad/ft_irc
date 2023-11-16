@@ -2,9 +2,8 @@
 
 void privmsg(Server *serv, char *buffer, int sd)
 {
-    std::cout << buffer << std::endl;
     int i = 0;
-    // int j = 0;
+    // int j;
     std::string buf(buffer);
     for (; buf[8 + i] && buf[8 + i] != ' ' && buf[8 + i] != '\r' && buf[8 + i] != '\n';i++);
     std::string channel_name(buf.substr(8, i));

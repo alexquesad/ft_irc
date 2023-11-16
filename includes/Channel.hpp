@@ -20,13 +20,12 @@ class Channel
     public:
 
     Channel(std::string channel_name);
-    Channel(const Channel &T);
-    Channel &operator=(const Channel &T);
     ~Channel();
     std::map<int, User*> & getUsers();
     std::map<int, User*> & getOpers();
     std::string getTopic() const;
     std::string getChannelname() const;
+    void setTopic(std::string topic);
     int getUsersnumber() const;// if numberofuser == 0 map.erase channel
     void addUser(int sd, User *user);
     void addOper(int sd, User *user);

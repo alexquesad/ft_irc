@@ -9,8 +9,10 @@ Server::Server(const std::string &port, const std::string &password) : _port(por
 	this->_commandhandler.insert(std::make_pair("NICK", &nick));
 	this->_commandhandler.insert(std::make_pair("JOIN", &join));
 	this->_commandhandler.insert(std::make_pair("PRIVMSG", &privmsg));
-	// this->_commandhandler.insert(std::make_pair("PING", &ping));
-	// this->_commandhandler.insert(std::make_pair("PONG", &pong));
+	this->_commandhandler.insert(std::make_pair("PING", &ping));
+	this->_commandhandler.insert(std::make_pair("PONG", &pong));
+	this->_commandhandler.insert(std::make_pair("PART", &part));
+	this->_commandhandler.insert(std::make_pair("TOPIC", &topic));
 	// this->_commandhandler.insert(std::make_pair("userhost", &user));
 }
 
@@ -83,7 +85,7 @@ void Server::new_connection(void)
 				nick += ret[occ + 5 + i];
 			if (nickname_is_in_use(this, nick))
 			{
-				sendMessage(send_rpl_err(433, this, NULL, nick, ""), this->_sockcom);
+				sendMessage(nick + " :Nickname is already in use", this->_sockcom);
 				is_nick_good = false;
 				break;
 			}		
@@ -196,12 +198,14 @@ void Server::connectToServer()
 								if (it->first == sd)
 								{
 									// pour chaque channel dans user effacer ce user dans le channel;
-									std::vector<std::string> channel_of_user = it->second->getChannels();
-									for (std::vector<std::string>::iterator itt = channel_of_user.begin(); itt != channel_of_user.end(); itt++)
+									std::set<std::string> channel_of_user = it->second->getChannels();
+									std::cout << "%" << *(it->second) << std::endl;
+									for (std::set<std::string>::iterator itt = channel_of_user.begin(); itt != channel_of_user.end(); itt++)
 									{
 										this->_channels.find(*itt)->second->leftUser(sd);
 										if (this->_channels.find(*itt)->second->getUsersnumber() == 0)
 											this->_channels.erase(*itt);
+										this->getUsers().find(sd)->second->getChannels().clear();
 									}
 									this->_users.erase(it);
 									// delete it->second;
@@ -295,11 +299,11 @@ std::ostream	&operator<<(std::ostream &stdout, std::map<int, User*> &users)
 	return (stdout);
 }
 
-std::ostream	&operator<<(std::ostream &stdout, User const &user)
+std::ostream	&operator<<(std::ostream &stdout, User &user)
 {
     int i = 0;
-    std::vector<std::string> channels = user.getChannels();
-    for (std::vector<std::string>::iterator it = channels.begin(); it != channels.end(); it++, i++)
+    std::set<std::string> channels = user.getChannels();
+    for (std::set<std::string>::iterator it = channels.begin(); it != channels.end(); it++, i++)
     {
         stdout << "Channel " << i << " of User " << user.getNickname() << " is called " << *it << std::endl;
     }
