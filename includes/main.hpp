@@ -21,10 +21,13 @@ class User;
 #include "Command.hpp"
 #include "Channel.hpp"
 #include "Server.hpp"
-#include "Replies.hpp"
+#include "RPL_ERR.hpp"
 
 # define SERVER_NAME "localhost"
 # define ver "1.0"
+
+# define FIND_USER(sd) \
+    serv->getUsers().find(sd)->second
 
 class Server;
 class User;
