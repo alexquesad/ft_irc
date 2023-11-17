@@ -78,7 +78,7 @@ void channelMode(Server *serv, User *user, Channel *channel, std::string mode, i
     // channel->setMode(channelMode);
     // sendMessage(send_rpl_err(221, serv, channel, channelMode, ""), sd);
     // // std::cout << "channelMode: " << userMode << std::endl;
-}
+// }
 
 void userMode(Server *serv, User *user, std::string mode, int sd)
 {
@@ -90,7 +90,7 @@ void userMode(Server *serv, User *user, std::string mode, int sd)
         std::string deletedMode;
         for (i = 1; mode[i]; i++)
         {
-            if (availableMode(mode[i]) == false)
+            if (availableMode(mode[i], USER_MODE) == false)
                 sendMessage(send_rpl_err(501, serv, user, "", ""), sd);
             else if (userMode.find(mode[i]) != std::string::npos)
             {
@@ -109,7 +109,7 @@ void userMode(Server *serv, User *user, std::string mode, int sd)
         std::string addedMode;
         for ((mode[0] != '+') ? i = 0: i = 1; mode[i]; i++)
         {
-            if (availableMode(mode[i]) == false)
+            if (availableMode(mode[i], USER_MODE) == false)
                 sendMessage(send_rpl_err(501, serv, user, "", ""), sd);
             else if (userMode.find(mode[i]) == std::string::npos)
                 addedMode += mode[i];

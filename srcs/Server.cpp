@@ -109,8 +109,7 @@ void Server::new_connection(void)
 			for (;ret[occ + 9 + i] && ret[occ + 9 + i] != '\n' && ret[occ + 9 + i] != '\r'; i++)
 				real_name += ret[occ + 9 + i];
 		}
-	}
-	while (ret.find("USER") == std::string::npos);
+	} while (ret.find("USER") == std::string::npos);
 	if (is_pass_good == true && _users.size() < 10 && is_nick_good == true)
 	{
 		this->_server_name = server_name;

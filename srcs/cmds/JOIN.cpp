@@ -12,6 +12,8 @@ bool checkInvalidCharacter(char c)
 
 bool channelNameInvalid(std::string name)
 {
+    if (name.size() > 50)
+        return false;
     std::string::iterator it = name.begin();
     for (; it != name.end() && !checkInvalidCharacter(*it); it++);
     return (it == name.end());
@@ -63,9 +65,16 @@ void join(Server *serv, char *buffer, int sd)
             break;
         }
         if (!channelNameInvalid(channel_name))
-            std::cout << "TEDAUYGDASUCLKXZ;C" << std::endl;
-        Channel *chan = new Channel(channel_name);
-        serv->setChannels(channel_name, chan);
+        {
+            sendMessage(channel_name + ":Erroneous Channel Name", sd);
+            continue ;
+        }
+        std::cout << "[" << i << "]{" << nb_of_channels << "}" << std::endl;
+        if (serv->getChannels().find(channel_name) == serv->getChannels().end())
+        {
+            Channel *chan = new Channel(channel_name);
+            serv->setChannels(channel_name, chan);
+        }
         //On ajoute le client a notre serveur
         if (FIND_CHANNEL(channel_name)->getUsersnumber() == 0)
             FIND_CHANNEL(channel_name)->addOper(sd, FIND_USER(sd));
