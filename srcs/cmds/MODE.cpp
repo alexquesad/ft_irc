@@ -2,33 +2,32 @@
 
 bool availableMode(char c, std::string availableMode)
 {
-    // std::string availableMode = "iwoOr";
     return (!(availableMode.find(c) == std::string::npos));
-
 }
 
-void channelMode(Server *serv, User *user, Channel *channel, std::string mode, int sd)
+void channelMode(Server *serv, Channel *channel, std::string mode, int sd, std::string buffer)
 {
     std::string channelMode = channel->getMode();
     int i;
+    (void)buffer;
 
     if (mode[0] == '-')
     {
         std::string deletedMode;
         for (i = 1; mode[i]; i++)
         {
-            if (availableMode(mode[i]) == false)
-                sendMessage(send_rpl_err(501, serv, user, "", ""), sd);
+            if (availableMode(mode[i], "aimnptlk") == false)
+                sendMessage(send_rpl_err(501, serv, FIND_USER(sd), "", ""), sd);
             else if (channelMode.find(mode[i]) != std::string::npos)
             {
                 deletedMode += mode[i];
                 channelMode.erase(channelMode.find(mode[i]), 1);
             }
         }
-        user->setMode(channelMode);
+        channel->setMode(channelMode);
         std::string user_answer = user_output(FIND_USER(sd));
         if (!deletedMode.empty())
-            user_answer += "MODE " + user->getNickname() + " -" + deletedMode;
+            user_answer += "MODE " + channel->getChannelname() + " -" + deletedMode;
         sendMessage(user_answer, sd);
     }
     else
@@ -36,49 +35,18 @@ void channelMode(Server *serv, User *user, Channel *channel, std::string mode, i
         std::string addedMode;
         for ((mode[0] != '+') ? i = 0: i = 1; mode[i]; i++)
         {
-            if (availableMode(mode[i]) == false)
-                sendMessage(send_rpl_err(501, serv, user, "", ""), sd);
-            else if (userMode.find(mode[i]) == std::string::npos)
+            if (availableMode(mode[i], "aimnptlk") == false)
+                sendMessage(send_rpl_err(501, serv, FIND_USER(sd), "", ""), sd);
+            else if (channelMode.find(mode[i]) == std::string::npos)
                 addedMode += mode[i];
         }
-        user->setMode(userMode + addedMode);
+        channel->setMode(channelMode + addedMode);
         std::string user_answer = user_output(FIND_USER(sd));
         if (!addedMode.empty())
-            user_answer += "MODE " + user->getNickname() + " +" + addedMode;
+            user_answer += "MODE " + channel->getChannelname() + " +" + addedMode;
         sendMessage(user_answer, sd);
     }
-
-
-
-
-
-
-
-
-    // if (mode[0] == '-')
-    // {
-    //     for (int i = 1; mode[i]; i++)
-    //     {
-    //         if (availableMode(mode[i]) == false)
-    //             sendMessage(send_rpl_err(501, serv, user, "", ""), sd);
-    //         else if (channelMode.find(mode[i]) != std::string::npos)
-    //             channelMode.erase(channelMode.find(mode[i]));
-    //     }
-    // }
-    // else
-    // {
-    //     for (int i = 1; mode[i]; i++)
-    //     {
-    //         if (availableMode(mode[i]) == false)
-    //             sendMessage(send_rpl_err(501, serv, user, "", ""), sd);
-    //         else if (channelMode.find(mode[i]) == std::string::npos)
-    //             channelMode += mode[i];
-    //     }
-    // }
-    // channel->setMode(channelMode);
-    // sendMessage(send_rpl_err(221, serv, channel, channelMode, ""), sd);
-    // // std::cout << "channelMode: " << userMode << std::endl;
-// }
+}
 
 void userMode(Server *serv, User *user, std::string mode, int sd)
 {
@@ -137,12 +105,13 @@ void mode(Server *serv, char *buffer, int sd)
     mode.erase(i, mode.length());
     if (mode.empty())
             sendMessage(send_rpl_err(221, serv, FIND_USER(sd), '+' + FIND_USER(sd)->getMode(), ""), sd);
-    // else if (!msgtarget.empty() && idOfChannel.find(msgtarget[0]) != std::string::npos)
-    // {
-    //     if (serv->getChannels().find(msgtarget) == serv->getChannels().end())
-    //         sendMessage(send_rpl_err(403, serv, FIND_USER(sd), msgtarget, ""), sd);
-    //     else if (FIND_CHANNEL(msgtarget))
-    // }
+    else if (!msgtarget.empty() && idOfChannel.find(msgtarget[0]) != std::string::npos)
+    {
+        if (serv->getChannels().find(msgtarget) == serv->getChannels().end())
+            sendMessage(send_rpl_err(403, serv, FIND_USER(sd), msgtarget, ""), sd);
+        else
+            channelMode(serv, FIND_CHANNEL(msgtarget), mode, sd, buffer);
+    }
     else
     {
         int userSd;

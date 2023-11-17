@@ -21,7 +21,7 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
 
 //004
 # define RPL_MYINFO \
-    (SERVER_NAME " " ver " iwoOr <available channel modes>")
+    (SERVER_NAME " " ver " " USER_MODE " " CHANNEL_MODE)
 
 //005
 # define RPL_BOUNCE(port) \
