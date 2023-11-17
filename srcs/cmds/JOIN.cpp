@@ -5,6 +5,18 @@
 
 // }
 
+bool checkInvalidCharacter(char c)
+{
+    return (c == '\0' || c == '\a' || c == '\r' || c == '\n' || c == ' ' || c == ',' || c == ':');
+}
+
+bool channelNameInvalid(std::string name)
+{
+    std::string::iterator it = name.begin();
+    for (; it != name.end() && !checkInvalidCharacter(*it); it++);
+    return (it == name.end());
+}
+
 int count_keys(std::string str, int nb_of_channels)
 {
     int i = 0;
@@ -45,12 +57,15 @@ void join(Server *serv, char *buffer, int sd)
     {
         std::string channel_name = channels_name.substr(0, channels_name.find(","));
         channels_name.erase(0, channels_name.find(",") + 1);
-
-        // if (serv->getChannels().find(channel_name) == serv->getChannels().end()) // si le channel n'existe pas on le cree et on l'ajoute a notre map de channel
-        // {
+        if (!(serv->getUsers().find(sd)->second->getChannelsSize() < 10))
+        {
+            sendMessage(send_rpl_err(405, serv, serv->getUsers().find(sd)->second, channel_name, ""), sd);
+            break;
+        }
+        if (!channelNameInvalid(channel_name))
+            std::cout << "TEDAUYGDASUCLKXZ;C" << std::endl;
         Channel *chan = new Channel(channel_name);
         serv->setChannels(channel_name, chan);
-        // }
         //On ajoute le client a notre serveur
         if (serv->getChannels().find(channel_name)->second->getUsersnumber() == 0)
             serv->getChannels().find(channel_name)->second->addOper(sd, serv->getUsers().find(sd)->second);
@@ -61,10 +76,7 @@ void join(Server *serv, char *buffer, int sd)
         user_answer += buffer;
         sendEveryone(user_answer, serv->getChannels().find(channel_name)->second);
         if (serv->getChannels().find(channel_name)->second->getTopic() == "")
-        {
             sendMessage(send_rpl_err(331, serv, serv->getUsers().find(sd)->second, channel_name, ""), sd);
-            std::cout << "test" << std::endl;
-        }
         else
             sendMessage(send_rpl_err(332, serv, serv->getUsers().find(sd)->second, channel_name, serv->getChannels().find(channel_name)->second->getTopic()), sd);
         std::string list_of_user = serv->getChannels().find(channel_name)->second->get_list_of_user_in_chan();

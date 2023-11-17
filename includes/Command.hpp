@@ -12,6 +12,6 @@ void ping(Server *serv, char *buffer, int sd);
 void pong(Server *serv, char *buffer, int sd);
 void part(Server *serv, char *buffer, int sd);
 void topic(Server *serv, char *buffer, int sd);
-
+void kick(Server *serv, char *buffer, int sd);
 
 #endif

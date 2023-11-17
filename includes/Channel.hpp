@@ -30,6 +30,7 @@ class Channel
     void addUser(int sd, User *user);
     void addOper(int sd, User *user);
     void leftUser(int sd);
+    int searchUserByNickname(std::string nickname);
     std::string get_list_of_user_in_chan();
 };
 

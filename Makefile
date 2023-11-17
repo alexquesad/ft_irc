@@ -4,7 +4,6 @@ SRCS =	srcs/main.cpp\
 		srcs/Server.cpp\
 		srcs/User.cpp\
 		srcs/Channel.cpp\
-		srcs/Command.cpp \
 		srcs/send_replies.cpp\
 		srcs/utils.cpp\
 		srcs/send.cpp\
@@ -13,7 +12,8 @@ SRCS =	srcs/main.cpp\
 		srcs/cmds/PRIVMSG.cpp\
 		srcs/cmds/PART.cpp\
 		srcs/cmds/PINGPONG.cpp\
-		srcs/cmds/TOPIC.cpp
+		srcs/cmds/TOPIC.cpp\
+		srcs/cmds.KICK.cpp
 
 CXX = c++
 

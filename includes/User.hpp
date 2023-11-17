@@ -21,6 +21,7 @@ class User{
 	std::string getHostname() const;
 	std::string getReal_name() const;
 	std::set<std::string> &getChannels();
+	size_t getChannelsSize() const;
 	void add_channel(std::string channel_name);
 	void setNick(std::string new_nickname);
 	// bool getIs_oper() const;

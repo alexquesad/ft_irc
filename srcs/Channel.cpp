@@ -57,6 +57,21 @@ void Channel::leftUser(int sd)
         this->_opers.erase(it);
 }
 
+int Channel::searchUserByNickname(std::string nickname)
+{
+    for (std::map<int, User*>::iterator it = this->_users.begin(); it != this->_users.end(); it++)
+    {
+        if (nickname.compare(it->second->getNickname()) == 0)
+            return it->first;
+    }
+    for (std::map<int, User*>::iterator it = this->_opers.begin(); it != this->_opers.end(); it++)
+    {
+        if (nickname.compare(it->second->getNickname()) == 0)
+            return it->first;
+    }
+    return (-1);
+}
+
 std::string Channel::get_list_of_user_in_chan()
 {
     std::string output;

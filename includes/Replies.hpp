@@ -113,6 +113,10 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
 # define ERR_CANNOTSENDTOCHAN(channel) \
     (channel + " :Cannot send to channel")
 
+//405
+# define ERR_TOOMANYCHANNELS(channel) \
+    (channel + " :You have joined too many channels")
+
 //411
 # define ERR_NORECIPIENT \
     (":No recipient given (<command>)")
@@ -151,7 +155,7 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
 
 //441
 # define ERR_USERNOTINCHANNEL(nick, channel) \
-    (nick + " " + channel " :They aren't on that channel")
+    (nick + " " + channel + " :They aren't on that channel")
 
 //442
 # define ERR_NOTONCHANNEL(channel) \

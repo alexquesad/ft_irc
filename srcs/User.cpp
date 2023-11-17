@@ -32,6 +32,11 @@ std::set<std::string> & User::getChannels()
     return this->_channels;
 }
 
+size_t User::getChannelsSize() const
+{
+    return this->_channels.size();
+}
+
 void User::add_channel(std::string channel_name)
 {
     if (this->_channels.find(channel_name) == this->_channels.end())

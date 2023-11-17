@@ -90,12 +90,15 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
         // case 402:
         //     ret += ERR_NOSUCHSERVER;
 		// 	break;
-        // case 403:
-        //     ret += ERR_NOSUCHCHANNEL;
-		// 	break;
+        case 403:
+            ret += ERR_NOSUCHCHANNEL(args);
+			break;
         // case 404:
         //     ret += ERR_CANNOTSENDTOCHAN;
 		// 	break;
+        case 405:
+            ret += ERR_TOOMANYCHANNELS(args);
+            break;
         // case 411:
         //     ret += ERR_NORECIPIENT;
 		// 	break;
@@ -123,12 +126,12 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
         case 433:
             ret += ERR_NICKNAMEINUSE(args);
 			break;
-        // case 441:
-        //     ret += ERR_USERNOTINCHANNEL(user->getNickname());
-		// 	break;
-        // case 442:
-        //     ret += ERR_NOTONCHANNEL;
-		// 	break;
+        case 441:
+            ret += ERR_USERNOTINCHANNEL(args, args2);
+			break;
+        case 442:
+            ret += ERR_NOTONCHANNEL(args);
+			break;
         // case 443:
         //     ret += ERR_USERONCHANNEL(user->getUsername());
 		// 	break;
