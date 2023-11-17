@@ -33,9 +33,12 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
         case 005:
             ret += RPL_BOUNCE(serv->getPort());
 			break;
-        // case 221:
-        //     ret += RPL_UMODEIS;
-		// 	break;
+        case 221:
+            ret += RPL_UMODEIS(args);
+			break;
+        // case 301:
+        //     ret += RPL_AWAY(args);
+        //     break;
         // case 315:
         //     ret += RPL_ENDOFWHO(user->getUsername());
 		// 	break;
@@ -168,12 +171,12 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
         // case 476:
         //     ret += ERR_BADCHANMASK;
 		// 	break;
-        // case 482:
-        //     ret += ERR_CHANOPRIVSNEEDED;
-		// 	break;
-        // case 501:
-        //     ret += ERR_UMODEUNKNOWNFLAG;
-		// 	break;
+        case 482:
+            ret += ERR_CHANOPRIVSNEEDED(args);
+			break;
+        case 501:
+            ret += ERR_UMODEUNKNOWNFLAG;
+			break;
         // case 502:
         //     ret += ERR_USERSDONTMATCH;
 		// 	break;

@@ -21,15 +21,19 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
 
 //004
 # define RPL_MYINFO \
-    (SERVER_NAME " " ver " <available user modes> <available channel modes>")
+    (SERVER_NAME " " ver " iwoOr <available channel modes>")
 
 //005
 # define RPL_BOUNCE(port) \
     ("Try server " SERVER_NAME ", port " + port)
 
 //221
-# define RPL_UMODEIS \
-    ("<user mode string>")
+# define RPL_UMODEIS(args) \
+    (args)
+
+//301
+# define RPL_AWAY(nick) \
+    (nick + " :Message has been sent !")
 
 //315
 # define RPL_ENDOFWHO(name) \

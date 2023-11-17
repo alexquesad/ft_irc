@@ -14,6 +14,7 @@ Server::Server(const std::string &port, const std::string &password) : _port(por
 	this->_commandhandler.insert(std::make_pair("PART", &part));
 	this->_commandhandler.insert(std::make_pair("TOPIC", &topic));
 	this->_commandhandler.insert(std::make_pair("KICK", &kick));
+	this->_commandhandler.insert(std::make_pair("MODE", &mode));
 	// this->_commandhandler.insert(std::make_pair("userhost", &user));
 }
 

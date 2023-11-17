@@ -37,6 +37,16 @@ size_t User::getChannelsSize() const
     return this->_channels.size();
 }
 
+std::string User::getMode() const
+{
+    return this->_mode;
+}
+
+void User::setMode(std::string mode)
+{
+    this->_mode = mode;
+}
+
 void User::add_channel(std::string channel_name)
 {
     if (this->_channels.find(channel_name) == this->_channels.end())

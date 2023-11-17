@@ -13,7 +13,8 @@ SRCS =	srcs/main.cpp\
 		srcs/cmds/PART.cpp\
 		srcs/cmds/PINGPONG.cpp\
 		srcs/cmds/TOPIC.cpp\
-		srcs/cmds/KICK.cpp
+		srcs/cmds/KICK.cpp\
+		srcs/cmds/MODE.cpp
 
 CXX = c++
 

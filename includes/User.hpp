@@ -10,8 +10,8 @@ class User{
 	std::string _hostname;
 	std::string _real_name;
 	std::set<std::string> _channels;
-	// bool _is_connect;
-	// bool _is_oper;
+	std::string _mode;
+
 
 	public:
 	User(std::string nick, std::string user, std::string hostname, std::string real_name);
@@ -22,8 +22,10 @@ class User{
 	std::string getReal_name() const;
 	std::set<std::string> &getChannels();
 	size_t getChannelsSize() const;
+	std::string getMode() const;
 	void add_channel(std::string channel_name);
 	void setNick(std::string new_nickname);
+	void setMode(std::string mode);
 	// bool getIs_oper() const;
 
 };
