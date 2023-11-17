@@ -280,6 +280,16 @@ void Server::setUsers(int sd, User *user)
 	this->_users.insert(std::make_pair(sd, user));
 }
 
+int Server::searchUserByNickname(std::string nickname)
+{
+    for (std::map<int, User*>::iterator it = this->_users.begin(); it != this->_users.end(); it++)
+    {
+        if (nickname.compare(it->second->getNickname()) == 0)
+            return it->first;
+    }
+    return (-1);
+}
+
 std::ostream	&operator<<(std::ostream &stdout, std::map<std::string, Channel*> &channels)
 {
 	int i = 0;

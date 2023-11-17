@@ -57,9 +57,9 @@ void join(Server *serv, char *buffer, int sd)
     {
         std::string channel_name = channels_name.substr(0, channels_name.find(","));
         channels_name.erase(0, channels_name.find(",") + 1);
-        if (!(serv->getUsers().find(sd)->second->getChannelsSize() < 10))
+        if (!(FIND_USER(sd)->getChannelsSize() < 10))
         {
-            sendMessage(send_rpl_err(405, serv, serv->getUsers().find(sd)->second, channel_name, ""), sd);
+            sendMessage(send_rpl_err(405, serv, FIND_USER(sd), channel_name, ""), sd);
             break;
         }
         if (!channelNameInvalid(channel_name))
@@ -67,20 +67,20 @@ void join(Server *serv, char *buffer, int sd)
         Channel *chan = new Channel(channel_name);
         serv->setChannels(channel_name, chan);
         //On ajoute le client a notre serveur
-        if (serv->getChannels().find(channel_name)->second->getUsersnumber() == 0)
-            serv->getChannels().find(channel_name)->second->addOper(sd, serv->getUsers().find(sd)->second);
+        if (FIND_CHANNEL(channel_name)->getUsersnumber() == 0)
+            FIND_CHANNEL(channel_name)->addOper(sd, FIND_USER(sd));
         else
-            serv->getChannels().find(channel_name)->second->addUser(sd, serv->getUsers().find(sd)->second);
-        serv->getUsers().find(sd)->second->add_channel(channel_name);
-        std::string user_answer = user_output(serv->getUsers().find(sd)->second);
+            FIND_CHANNEL(channel_name)->addUser(sd, FIND_USER(sd));
+        FIND_USER(sd)->add_channel(channel_name);
+        std::string user_answer = user_output(FIND_USER(sd));
         user_answer += buffer;
-        sendEveryone(user_answer, serv->getChannels().find(channel_name)->second);
-        if (serv->getChannels().find(channel_name)->second->getTopic() == "")
-            sendMessage(send_rpl_err(331, serv, serv->getUsers().find(sd)->second, channel_name, ""), sd);
+        sendEveryone(user_answer, FIND_CHANNEL(channel_name));
+        if (FIND_CHANNEL(channel_name)->getTopic() == "")
+            sendMessage(send_rpl_err(331, serv, FIND_USER(sd), channel_name, ""), sd);
         else
-            sendMessage(send_rpl_err(332, serv, serv->getUsers().find(sd)->second, channel_name, serv->getChannels().find(channel_name)->second->getTopic()), sd);
-        std::string list_of_user = serv->getChannels().find(channel_name)->second->get_list_of_user_in_chan();
-        sendMessage(send_rpl_err(353, serv, serv->getUsers().find(sd)->second, channel_name, list_of_user), sd);
-        sendMessage(send_rpl_err(366, serv, serv->getUsers().find(sd)->second, channel_name, ""), sd);
+            sendMessage(send_rpl_err(332, serv, FIND_USER(sd), channel_name, FIND_CHANNEL(channel_name)->getTopic()), sd);
+        std::string list_of_user = FIND_CHANNEL(channel_name)->get_list_of_user_in_chan();
+        sendMessage(send_rpl_err(353, serv, FIND_USER(sd), channel_name, list_of_user), sd);
+        sendMessage(send_rpl_err(366, serv, FIND_USER(sd), channel_name, ""), sd);
     }
 }

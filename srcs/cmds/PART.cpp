@@ -11,15 +11,19 @@ void    part(Server *serv, char *buffer, int sd)
     {
         std::string channel_name = channels_name.substr(0, channels_name.find(","));
         channels_name.erase(0, channels_name.find(",") + 1);
-        if (serv->getUsers().find(sd)->second->getChannels().find(channel_name) != serv->getUsers().find(sd)->second->getChannels().end())
+        if (serv->getChannels().find(channel_name) == serv->getChannels().end())
+            sendMessage(send_rpl_err(403, serv, FIND_USER(sd), channel_name, ""), sd);
+        else if (FIND_USER(sd)->getChannels().find(channel_name) == FIND_USER(sd)->getChannels().end())
+            sendMessage(send_rpl_err(442, serv, FIND_USER(sd), channel_name, ""), sd);
+        else
         {
-            std::string user_answer = user_output(serv->getUsers().find(sd)->second);
+            std::string user_answer = user_output(FIND_USER(sd));
             user_answer += buffer;
-            sendEveryone(user_answer, serv->getChannels().find(channel_name)->second);
-            serv->getChannels().find(channel_name)->second->leftUser(sd);
-            if (serv->getChannels().find(channel_name)->second->getUsersnumber() == 0)
+            sendEveryone(user_answer, FIND_CHANNEL(channel_name));
+            FIND_CHANNEL(channel_name)->leftUser(sd);
+            if (FIND_CHANNEL(channel_name)->getUsersnumber() == 0)
                 serv->getChannels().erase(serv->getChannels().find(channel_name)->first);
-            serv->getUsers().find(sd)->second->getChannels().erase(channel_name);
+            FIND_USER(sd)->getChannels().erase(channel_name);
         }
     }
 }

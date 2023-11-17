@@ -1,4 +1,4 @@
-#include "../main.hpp"
+#include "main.hpp"
 
 void kick(Server *serv, char *buffer, int sd)
 {
@@ -22,18 +22,18 @@ void kick(Server *serv, char *buffer, int sd)
             std::string channel_name = channels_name.substr(0, channels_name.find(","));
             channels_name.erase(0, channels_name.find(",") + 1);
             int userToKickSd;
-            if ((userToKickSd = serv->getChannels().find(channels_name)->second->searchUserByNickname(user_nick)) == -1)
+            if ((userToKickSd = FIND_CHANNEL(channel_name)->searchUserByNickname(user_nick)) == -1)
                 sendMessage(send_rpl_err(441, serv, FIND_USER(sd), user_nick, channel_name), sd);
             else
             {
-                std::string user_answer = user_output(serv->getUsers().find(sd)->second);
+                std::string user_answer = user_output(FIND_USER(sd));
                 user_answer += buffer;
-                sendEveryone(user_answer, serv->getChannels().find(channel_name)->second, userToKickSd);
-                serv->getChannels().find(channel_name)->second->leftUser(userToKickSd);
-                if (serv->getChannels().find(channel_name)->second->getUsersnumber() == 0)
+                sendEveryone(user_answer, FIND_CHANNEL(channel_name), userToKickSd);
+                FIND_CHANNEL(channel_name)->leftUser(userToKickSd);
+                if (FIND_CHANNEL(channel_name)->getUsersnumber() == 0)
                     serv->getChannels().erase(serv->getChannels().find(channel_name)->first);
-                serv->getUsers().find(userToKickSd)->second->getChannels().erase(channel_name);
-                user_answer = user_output(serv->getUsers().find(userToKickSd)->second);
+                FIND_USER(userToKickSd)->getChannels().erase(channel_name);
+                user_answer = user_output(FIND_USER(userToKickSd));
                 user_answer += "PART " + channel_name + "\r\n";
                 sendMessage(user_answer, userToKickSd);
             }

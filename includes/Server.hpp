@@ -36,6 +36,7 @@ class Server{
 	std::string getPort() const;
 	void setChannels(std::string channel_name, Channel *chan);
 	void setUsers(int sd, User *user);
+	int searchUserByNickname(std::string nickname);
 	void new_connection(void);
 
 };

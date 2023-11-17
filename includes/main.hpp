@@ -17,17 +17,19 @@
 #include <errno.h>
 
 #include "User.hpp"
-class User;
 #include "Command.hpp"
 #include "Channel.hpp"
 #include "Server.hpp"
-#include "RPL_ERR.hpp"
+#include "Replies.hpp"
 
 # define SERVER_NAME "localhost"
 # define ver "1.0"
 
 # define FIND_USER(sd) \
     serv->getUsers().find(sd)->second
+
+# define FIND_CHANNEL(channel_name) \
+    serv->getChannels().find(channel_name)->second
 
 class Server;
 class User;

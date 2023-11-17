@@ -39,22 +39,22 @@ void nick(Server *serv, char *buffer, int sd)
     std::cout << "[ " << new_nickname << " ]" << std::endl;
     if (new_nickname.empty())
     {
-        sendMessage(send_rpl_err(431, serv, serv->getUsers().find(sd)->second, "", ""), sd);
+        sendMessage(send_rpl_err(431, serv, FIND_USER(sd), "", ""), sd);
         return ;
     }
     if (!nickname_is_valid(new_nickname))
     {
-        sendMessage(send_rpl_err(432, serv, serv->getUsers().find(sd)->second, new_nickname, ""), sd);
+        sendMessage(send_rpl_err(432, serv, FIND_USER(sd), new_nickname, ""), sd);
         return ;
     }
     if (nickname_is_in_use(serv, new_nickname))
     {
-        sendMessage(send_rpl_err(433, serv, serv->getUsers().find(sd)->second, new_nickname, ""), sd);
+        sendMessage(send_rpl_err(433, serv, FIND_USER(sd), new_nickname, ""), sd);
         return ;
     }
-    std::string user_answer = user_output(serv->getUsers().find(sd)->second);
+    std::string user_answer = user_output(FIND_USER(sd));
     user_answer += buffer;
     std::cout << user_answer << std::endl;
     sendMessage(user_answer, sd);
-    serv->getUsers().find(sd)->second->setNick(new_nickname);
+    FIND_USER(sd)->setNick(new_nickname);
 }
