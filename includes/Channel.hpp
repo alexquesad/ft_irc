@@ -13,6 +13,8 @@ class Channel
     std::map<int, User*> _opers;
     std::string _channel_name;
     std::string _topic;
+    std::string _mode;
+    std::string _key;
     //mode
     //blacklist
     //whitelist
@@ -27,6 +29,8 @@ class Channel
     std::string getChannelname() const;
     void setTopic(std::string topic);
     int getUsersnumber() const;// if numberofuser == 0 map.erase channel
+    std::string getMode() const;
+    void setMode(std::string mode);
     void addUser(int sd, User *user);
     void addOper(int sd, User *user);
     void leftUser(int sd);

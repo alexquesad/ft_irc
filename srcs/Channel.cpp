@@ -38,6 +38,16 @@ std::map<int, User*> & Channel::getOpers()
     return this->_opers;
 }
 
+std::string Channel::getMode() const
+{
+    return this->_mode;
+}
+
+void Channel::setMode(std::string mode)
+{
+    this->_mode = mode;
+}
+
 void Channel::addUser(int sd, User *user)
 {
     this->_users.insert(std::make_pair(sd, user));

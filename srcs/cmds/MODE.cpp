@@ -1,40 +1,84 @@
 #include "main.hpp"
 
-bool availableMode(char c)
+bool availableMode(char c, std::string availableMode)
 {
-    std::string availableMode = "iwoOr";
+    // std::string availableMode = "iwoOr";
     return (!(availableMode.find(c) == std::string::npos));
 
 }
 
-// void channelMode(Server *serv, User *user, Channel *channel, std::string mode, int sd)
-// {
-//     std::string channelMode = channel->getMode();
+void channelMode(Server *serv, User *user, Channel *channel, std::string mode, int sd)
+{
+    std::string channelMode = channel->getMode();
+    int i;
 
-//     if (mode[0] == '-')
-//     {
-//         for (int i = 1; mode[i]; i++)
-//         {
-//             if (availableMode(mode[i]) == false)
-//                 sendMessage(send_rpl_err(501, serv, user, "", ""), sd);
-//             else if (channelMode.find(mode[i]) != std::string::npos)
-//                 channelMode.erase(channelMode.find(mode[i]));
-//         }
-//     }
-//     else
-//     {
-//         for (int i = 1; mode[i]; i++)
-//         {
-//             if (availableMode(mode[i]) == false)
-//                 sendMessage(send_rpl_err(501, serv, user, "", ""), sd);
-//             else if (channelMode.find(mode[i]) == std::string::npos)
-//                 channelMode += mode[i];
-//         }
-//     }
-//     channel->setMode(channelMode);
-//     sendMessage(send_rpl_err(221, serv, channel, channelMode, ""), sd);
-//     // std::cout << "channelMode: " << userMode << std::endl;
-// }
+    if (mode[0] == '-')
+    {
+        std::string deletedMode;
+        for (i = 1; mode[i]; i++)
+        {
+            if (availableMode(mode[i]) == false)
+                sendMessage(send_rpl_err(501, serv, user, "", ""), sd);
+            else if (channelMode.find(mode[i]) != std::string::npos)
+            {
+                deletedMode += mode[i];
+                channelMode.erase(channelMode.find(mode[i]), 1);
+            }
+        }
+        user->setMode(channelMode);
+        std::string user_answer = user_output(FIND_USER(sd));
+        if (!deletedMode.empty())
+            user_answer += "MODE " + user->getNickname() + " -" + deletedMode;
+        sendMessage(user_answer, sd);
+    }
+    else
+    {
+        std::string addedMode;
+        for ((mode[0] != '+') ? i = 0: i = 1; mode[i]; i++)
+        {
+            if (availableMode(mode[i]) == false)
+                sendMessage(send_rpl_err(501, serv, user, "", ""), sd);
+            else if (userMode.find(mode[i]) == std::string::npos)
+                addedMode += mode[i];
+        }
+        user->setMode(userMode + addedMode);
+        std::string user_answer = user_output(FIND_USER(sd));
+        if (!addedMode.empty())
+            user_answer += "MODE " + user->getNickname() + " +" + addedMode;
+        sendMessage(user_answer, sd);
+    }
+
+
+
+
+
+
+
+
+    // if (mode[0] == '-')
+    // {
+    //     for (int i = 1; mode[i]; i++)
+    //     {
+    //         if (availableMode(mode[i]) == false)
+    //             sendMessage(send_rpl_err(501, serv, user, "", ""), sd);
+    //         else if (channelMode.find(mode[i]) != std::string::npos)
+    //             channelMode.erase(channelMode.find(mode[i]));
+    //     }
+    // }
+    // else
+    // {
+    //     for (int i = 1; mode[i]; i++)
+    //     {
+    //         if (availableMode(mode[i]) == false)
+    //             sendMessage(send_rpl_err(501, serv, user, "", ""), sd);
+    //         else if (channelMode.find(mode[i]) == std::string::npos)
+    //             channelMode += mode[i];
+    //     }
+    // }
+    // channel->setMode(channelMode);
+    // sendMessage(send_rpl_err(221, serv, channel, channelMode, ""), sd);
+    // // std::cout << "channelMode: " << userMode << std::endl;
+}
 
 void userMode(Server *serv, User *user, std::string mode, int sd)
 {
