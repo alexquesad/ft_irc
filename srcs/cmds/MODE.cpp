@@ -77,46 +77,43 @@ void mode_b(Server *serv, Channel *channel, std::string mode, std::string buffer
         }
         sendMessage(send_rpl_err(368, serv, FIND_USER(sd), channel->getChannelname(), ""), sd);
     }
-    else
+	else
     {
-        if (mode[0] == '-')
+        std::string full_name = name;
+        std::string nick = full_name.substr(0, full_name.find('!'));
+	    std::string user = full_name.substr(full_name.find('!') + 1, full_name.find('@') - (full_name.find('!') + 1));
+	    std::string host = full_name.substr(full_name.find('@') + 1, full_name.length() - (full_name.find('@') + 1));
+        if (nick.length() > 1 || (nick.length() == 1 && nick[0] != '*'))
         {
-            name = name.substr(3, name.find('@') - 3);
-            channel->getBanList().erase(name);
+            if (nick[0] == '*')
+                name = &nick[1];
+            else
+                name = nick;
+        }
+        else if (user.length() > 1 || (user.length() == 1 && user[0] != '*'))
+        {
+            if (user[0] == '*')
+                name = &user[1];
+            else
+                name = user;
+        }
+        else if (host.length() > 1 || (host.length() == 1 && host[0] != '*'))
+        {
+            if (host[0] == '*')
+                name = &host[1];
+            else
+                name = host;
         }
         else
         {
-            std::string full_name = name;
-            name = full_name.substr(0, full_name.find('!'));    //nickname
-            if (name.length() > 1)
-            {
-                if (name[0] == '*')
-                    channel->getBanList().insert(std::make_pair(&name[1], full_name));
-                else
-                    channel->getBanList().insert(std::make_pair(name, full_name));
-                return ;
-            }
-            name = full_name.substr(full_name.find('!') + 1, full_name.find('@') - (full_name.find('!') + 1));  //username
-            if (name.length() > 1)
-            {
-                if (name[0] == '*')
-                    channel->getBanList().insert(std::make_pair(&name[1], full_name));
-                else
-                    channel->getBanList().insert(std::make_pair(name, full_name));
-                return ;
-            }
-            name = full_name.substr(full_name.find('@') + 1, full_name.length() - (full_name.find('@') + 1));   //hostname
-            if (name.length() > 1)
-            {
-                if (name[0] == '*')
-                    channel->getBanList().insert(std::make_pair(&name[1], full_name));
-                else
-                    channel->getBanList().insert(std::make_pair(name, full_name));
-                return ;
-            }
-            channel->getBanList().insert(std::make_pair(name, full_name));
+            // aucun nick ni user ni hostname trouvé
         }
-    }
+		std::cout << "name: " << name << std::endl;
+        if (mode[0] == '-')
+            channel->getBanList().erase(name);
+        else
+            channel->getBanList().insert(std::make_pair(name, full_name));
+	}
 }
 
 bool availableMode(char c, std::string availableMode)
