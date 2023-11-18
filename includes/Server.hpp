@@ -9,6 +9,7 @@ class Server{
 	public:
 
 	typedef void (*command)(Server *, char *, int);
+	typedef void (*modes)(Server *, int);
 
 	private:
 
@@ -18,6 +19,7 @@ class Server{
 	const std::string _password;
 	std::map<int, User*> _users;
 	std::map<std::string, command> _commandhandler;
+	std::map<std::string, modes> _modehandler;
 	std::map<std::string, Channel*> _channels;
 	struct sockaddr_in server;
 	std::string _server_name;

@@ -18,6 +18,10 @@ void channelMode(Server *serv, Channel *channel, std::string mode, int sd, std::
         {
             if (availableMode(mode[i], "aimnptlk") == false)
                 sendMessage(send_rpl_err(501, serv, FIND_USER(sd), "", ""), sd);
+            else if (availableMode(mode[i], "OovbeI") == false)
+            {
+                
+            }
             else if (channelMode.find(mode[i]) != std::string::npos)
             {
                 deletedMode += mode[i];
