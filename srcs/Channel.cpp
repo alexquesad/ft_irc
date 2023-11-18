@@ -1,7 +1,6 @@
-
 #include "main.hpp"
 
-Channel::Channel(std::string channel_name) : _channel_name(channel_name), _topic(""){
+Channel::Channel(std::string channel_name) : _channel_name(channel_name), _topic("") {
 }
 
 Channel::~Channel(){}
@@ -61,6 +60,16 @@ std::string Channel::getMode() const
     return this->_mode;
 }
 
+std::string Channel::getKey() const
+{
+    return this->_key;
+}
+
+int Channel::getMaxUser() const
+{
+    return this->_maxUser;
+}
+
 void Channel::setTopic(std::string topic)
 {
     this->_topic = topic;
@@ -69,6 +78,16 @@ void Channel::setTopic(std::string topic)
 void Channel::setMode(std::string mode)
 {
     this->_mode = mode;
+}
+
+void Channel::setKey(std::string key)
+{
+    this->_key = key;
+}
+
+void Channel::setMaxUser(int maxUser)
+{
+    this->_maxUser = maxUser;
 }
 
 void Channel::addUser(int sd, User *user)
@@ -176,7 +195,7 @@ bool Channel::isException(std::string username)
     return (false);
 }
 
-bool Channel::isWhite(std::string username)
+bool Channel::isWhiteList(std::string username)
 {
     if (this->_whiteList.find(username) != this->_whiteList.end())
         return (true);

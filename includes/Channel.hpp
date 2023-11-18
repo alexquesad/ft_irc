@@ -16,6 +16,7 @@ class Channel
     std::string _topic;
     std::string _mode;
     std::string _key;
+    int _maxUser;
     std::map<std::string, std::string> _banList;
     std::set<std::string> _exceptionList;
     std::set<std::string> _whiteList;
@@ -36,8 +37,12 @@ class Channel
     std::set<std::string> & getInviteList();
     int getUsersnumber() const;
     std::string getMode() const;
+    std::string getKey() const;
+    int getMaxUser() const;
     void setTopic(std::string topic);
     void setMode(std::string mode);
+    void setKey(std::string key);
+    void setMaxUser(int maxUser);
     void addUser(int sd, User *user);
     void addChanops(int sd, User *user);
     void addVoices(int sd, User *user);
@@ -48,7 +53,7 @@ class Channel
     bool isChanop(int sd);
     bool isBan(std::string username);
     bool isException(std::string username);
-    bool isWhite(std::string username);
+    bool isWhiteList(std::string username);
     bool isInvited(std::string username);
 };
 

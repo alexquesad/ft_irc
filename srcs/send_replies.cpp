@@ -153,21 +153,21 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
         // case 467:
         //     ret += ERR_KEYSET;
 		// 	break;
-        // case 471:
-        //     ret += ERR_CHANNELISFULL;
-		// 	break;
+        case 471:
+            ret += ERR_CHANNELISFULL(args);
+			break;
         // case 472:
         //     ret += ERR_UNKNOWNMODE;
 		// 	break;
-        // case 473:
-        //     ret += ERR_INVITEONLYCHAN;
-		// 	break;
-        // case 474:
-        //     ret += ERR_BANNEDFROMCHAN;
-		// 	break;
-        // case 475:
-        //     ret += ERR_BADCHANNELKEY;
-		// 	break;
+        case 473:
+            ret += ERR_INVITEONLYCHAN(args);
+			break;
+        case 474:
+            ret += ERR_BANNEDFROMCHAN(args);
+			break;
+        case 475:
+            ret += ERR_BADCHANNELKEY(args);
+			break;
         // case 476:
         //     ret += ERR_BADCHANMASK;
 		// 	break;

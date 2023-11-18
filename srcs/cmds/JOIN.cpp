@@ -19,22 +19,21 @@ bool channelNameInvalid(std::string name)
     return (it == name.end());
 }
 
-int count_keys(std::string str, int nb_of_channels)
-{
-    int i = 0;
-    int result = nb_of_channels;
-    while (str.find(",x", i) != std::string::npos)
-    {
-        result--;
-        i += str.find(",x", i) + 1;
-    }
-    return (result);
-}
+// int count_keys(std::string str, int nb_of_channels)
+// {
+//     int i = 0;
+//     int result = nb_of_channels;
+//     while (str.find(",x", i) != std::string::npos)
+//     {
+//         result--;
+//         i += str.find(",x", i) + 1;
+//     }
+//     return (result);
+// }
 
 void join(Server *serv, char *buffer, int sd)
 {
-    int i = 0;
-    // int j = 0;
+    int i = 0, j = 0;
     // int nb_of_keys = 0;
     std::string buf(buffer);
     for (; buf[5 + i] && buf[5 + i] != ' ' && buf[5 + i] != '\r' && buf[5 + i] != '\n'; i++);
@@ -45,15 +44,14 @@ void join(Server *serv, char *buffer, int sd)
     //     return;
     // }
     int nb_of_channels = 1 + std::count(channels_name.begin(), channels_name.end(), ',');
-    // std::string keys_for_channels = "";
-    // if (buf[5 + i] && buf[5 + i] == ' ')
-    // {
-    //     for (; buf[6 + i + j] && buf[6 + i + j] != ' ' && buf[6 + i + j] != '\r' && buf[6 + i + j] != '\n'; j++);
-    //     keys_for_channels = buf.substr(6 + i, j);
-    // }
+    std::string keys_for_channels = "";
+    if (buf[5 + i] && buf[5 + i] == ' ')
+    {
+        for (; buf[6 + i + j] && buf[6 + i + j] != ' ' && buf[6 + i + j] != '\r' && buf[6 + i + j] != '\n'; j++);
+        keys_for_channels = buf.substr(6 + i, j);
+    }
     // if (!keys_for_channels.empty())
     //     nb_of_keys = count_keys(keys_for_channels, nb_of_channels); 
-
     //IMPORTANT ASSOCIATE KEYS WITH PRIVATE CHANNELS
     for (int i = 0; i < nb_of_channels; i++)
     {
@@ -67,13 +65,46 @@ void join(Server *serv, char *buffer, int sd)
         if (!channelNameInvalid(channel_name))
         {
             sendMessage(channel_name + ":Erroneous Channel Name", sd);
-            continue ;
+            continue;
         }
-        std::cout << "[" << i << "]{" << nb_of_channels << "}" << std::endl;
+        std::string key = keys_for_channels.substr(0, keys_for_channels.find(","));
+        keys_for_channels.erase(0, keys_for_channels.find(",") + 1);
         if (serv->getChannels().find(channel_name) == serv->getChannels().end())
         {
             Channel *chan = new Channel(channel_name);
             serv->setChannels(channel_name, chan);
+        }
+        if (FIND_CHANNEL(channel_name)->getMode().find("b") != std::string::npos)
+        {
+            if (FIND_CHANNEL(channel_name)->isBan(FIND_USER(sd)->getUsername()) == true)
+            {
+                sendMessage(send_rpl_err(474, serv, FIND_USER(sd), channel_name, ""), sd);
+                continue;
+            }
+        }
+        if (FIND_CHANNEL(channel_name)->getMode().find("i") != std::string::npos)
+        {
+            if ((FIND_CHANNEL(channel_name)->isInvited(FIND_USER(sd)->getUsername()) == false) || (FIND_CHANNEL(channel_name)->isWhiteList(FIND_USER(sd)->getUsername()) == false))
+            {
+                sendMessage(send_rpl_err(473, serv, FIND_USER(sd), channel_name, ""), sd);
+                continue;
+            }
+        }
+        if (FIND_CHANNEL(channel_name)->getMode().find("k") != std::string::npos)
+        {
+            if (FIND_CHANNEL(channel_name)->getKey().compare(key) != 0)
+            {
+                sendMessage(send_rpl_err(475, serv, FIND_USER(sd), channel_name, ""), sd);
+                continue;
+            }
+        }
+        if (FIND_CHANNEL(channel_name)->getMode().find("l") != std::string::npos)
+        {
+            if (FIND_CHANNEL(channel_name)->getMaxUser() <= FIND_CHANNEL(channel_name)->getUsersnumber())
+            {
+                sendMessage(send_rpl_err(471, serv, FIND_USER(sd), channel_name, ""), sd);
+                continue;
+            }
         }
         //On ajoute le client a notre serveur
         if (FIND_CHANNEL(channel_name)->getUsersnumber() == 0)
