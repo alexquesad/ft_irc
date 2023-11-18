@@ -13,7 +13,9 @@ void privmsg(Server *serv, char *buffer, int sd)
     user_answer += buffer;
     if (!msgtarget.empty() && idOfChannel.find(msgtarget[0]) != std::string::npos)
     {
-        if (serv->getChannels().find(msgtarget) == serv->getChannels().end())
+        if (FIND_CHANNEL(msgtarget)->isBan(FIND_USER(sd)->getNickname()) == true)
+            sendMessage(send_rpl_err(404, serv, FIND_USER(sd), msgtarget, ""), sd);
+        else if (serv->getChannels().find(msgtarget) == serv->getChannels().end())
             sendMessage(send_rpl_err(401, serv, FIND_USER(sd), msgtarget, ""), sd);
         else
             sendEveryone(user_answer, FIND_CHANNEL(msgtarget), sd);

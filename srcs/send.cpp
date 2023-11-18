@@ -13,7 +13,11 @@ void sendEveryone(std::string message, Channel *chan)
     {
         sendMessage(message, it->first);
     }
-    for (std::map<int, User *>::iterator it = chan->getOpers().begin(); it != chan->getOpers().end(); it++)
+    for (std::map<int, User *>::iterator it = chan->getChanops().begin(); it != chan->getChanops().end(); it++)
+    {
+        sendMessage(message, it->first);
+    }
+    for (std::map<int, User *>::iterator it = chan->getVoices().begin(); it != chan->getVoices().end(); it++)
     {
         sendMessage(message, it->first);
     }
@@ -26,7 +30,12 @@ void sendEveryone(std::string message, Channel *chan, int sd)
         if (sd != it->first)
             sendMessage(message, it->first);
     }
-    for (std::map<int, User *>::iterator it = chan->getOpers().begin(); it != chan->getOpers().end(); it++)
+    for (std::map<int, User *>::iterator it = chan->getChanops().begin(); it != chan->getChanops().end(); it++)
+    {
+        if (sd != it->first)
+            sendMessage(message, it->first);
+    }
+    for (std::map<int, User *>::iterator it = chan->getVoices().begin(); it != chan->getVoices().end(); it++)
     {
         if (sd != it->first)
             sendMessage(message, it->first);

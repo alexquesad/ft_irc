@@ -77,7 +77,7 @@ void join(Server *serv, char *buffer, int sd)
         }
         //On ajoute le client a notre serveur
         if (FIND_CHANNEL(channel_name)->getUsersnumber() == 0)
-            FIND_CHANNEL(channel_name)->addOper(sd, FIND_USER(sd));
+            FIND_CHANNEL(channel_name)->addChanops(sd, FIND_USER(sd));
         else
             FIND_CHANNEL(channel_name)->addUser(sd, FIND_USER(sd));
         FIND_USER(sd)->add_channel(channel_name);

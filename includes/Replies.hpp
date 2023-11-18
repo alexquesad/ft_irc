@@ -76,8 +76,8 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
     (channel + " :End of NAMES list")
 
 //367
-# define RPL_BANLIST(channel) \
-    (channel + " <banmask>")
+# define RPL_BANLIST(channel, banmask) \
+    (channel + " " + banmask)
 
 //368
 # define RPL_ENDOFBANLIST(channel) \

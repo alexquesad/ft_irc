@@ -69,12 +69,12 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
         case 366:
             ret += RPL_ENDOFNAMES(args);
 			break;
-        // case 367:
-        //     ret += RPL_BANLIST;
-		// 	break;
-        // case 368:
-        //     ret += RPL_ENDOFBANLIST;
-		// 	break;
+        case 367:
+            ret += RPL_BANLIST(args, args2);
+			break;
+        case 368:
+            ret += RPL_ENDOFBANLIST(args);
+			break;
         // case 372:
         //     ret += RPL_MOTD;
 		// 	break;
@@ -96,9 +96,9 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
         case 403:
             ret += ERR_NOSUCHCHANNEL(args);
 			break;
-        // case 404:
-        //     ret += ERR_CANNOTSENDTOCHAN;
-		// 	break;
+        case 404:
+            ret += ERR_CANNOTSENDTOCHAN(args);
+			break;
         case 405:
             ret += ERR_TOOMANYCHANNELS(args);
             break;

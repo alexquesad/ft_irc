@@ -15,13 +15,7 @@ Server::Server(const std::string &port, const std::string &password) : _port(por
 	this->_commandhandler.insert(std::make_pair("TOPIC", &topic));
 	this->_commandhandler.insert(std::make_pair("KICK", &kick));
 	this->_commandhandler.insert(std::make_pair("MODE", &mode));
-	// this->_commandhandler.insert(std::make_pair("userhost", &user));
-	// this->_modehandler.insert(std::make_pair("O", &mode_O));
-	// this->_modehandler.insert(std::make_pair("o", &mode_o));
-	// this->_modehandler.insert(std::make_pair("v", &mode_v));
-	// this->_modehandler.insert(std::make_pair("b", &mode_b));
-	// this->_modehandler.insert(std::make_pair("e", &mode_e));
-	// this->_modehandler.insert(std::make_pair("I", &mode_I));
+	// this->_commandhandler.insert(std::make_pair("MODE", &mode));
 }
 
 Server::~Server(){close(this->_sockserver);}

@@ -12,7 +12,7 @@ void topic(Server *serv, char *buffer, int sd)
         sendMessage(send_rpl_err(403, serv, FIND_USER(sd), channel_name, ""), sd);
     else if (FIND_USER(sd)->getChannels().find(channel_name) == FIND_USER(sd)->getChannels().end())
         sendMessage(send_rpl_err(442, serv, FIND_USER(sd), channel_name, ""), sd);
-    else if (FIND_CHANNEL(channel_name)->getOpers().find(sd) == FIND_CHANNEL(channel_name)->getOpers().end())
+    else if (FIND_CHANNEL(channel_name)->getChanops().find(sd) == FIND_CHANNEL(channel_name)->getChanops().end())
         sendMessage(send_rpl_err(482, serv, FIND_USER(sd), channel_name, ""), sd);
     else if (buf.find(':') == std::string::npos)
         sendMessage(send_rpl_err(461, serv, FIND_USER(sd), "TOPIC", ""), sd);
