@@ -87,8 +87,33 @@ void mode_b(Server *serv, Channel *channel, std::string mode, std::string buffer
         else
         {
             std::string full_name = name;
-            name = name.substr(3, name.find('@') - 3);
-            std::cout << name << " " << full_name << std::endl;
+            name = full_name.substr(0, full_name.find('!'));    //nickname
+            if (name.length() > 1)
+            {
+                if (name[0] == '*')
+                    channel->getBanList().insert(std::make_pair(&name[1], full_name));
+                else
+                    channel->getBanList().insert(std::make_pair(name, full_name));
+                return ;
+            }
+            name = full_name.substr(full_name.find('!') + 1, full_name.find('@') - (full_name.find('!') + 1));  //username
+            if (name.length() > 1)
+            {
+                if (name[0] == '*')
+                    channel->getBanList().insert(std::make_pair(&name[1], full_name));
+                else
+                    channel->getBanList().insert(std::make_pair(name, full_name));
+                return ;
+            }
+            name = full_name.substr(full_name.find('@') + 1, full_name.length() - (full_name.find('@') + 1));   //hostname
+            if (name.length() > 1)
+            {
+                if (name[0] == '*')
+                    channel->getBanList().insert(std::make_pair(&name[1], full_name));
+                else
+                    channel->getBanList().insert(std::make_pair(name, full_name));
+                return ;
+            }
             channel->getBanList().insert(std::make_pair(name, full_name));
         }
     }
@@ -202,8 +227,6 @@ void userMode(Server *serv, User *user, std::string mode, int sd)
 
 void mode(Server *serv, char *buffer, int sd)
 {
-    (void)serv;
-    (void)sd;
     int i = 0;
     std::string buf(buffer);
     for (; buf[5 + i] && buf[5 + i] != ' ' && buf[5 + i] != '\r' && buf[5 + i] != '\n';i++);
