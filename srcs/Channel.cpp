@@ -181,6 +181,13 @@ bool    Channel::isChanop(int sd)
     return (false);
 }
 
+bool    Channel::isVoices(int sd)
+{
+    if (this->_voices.find(sd) != this->_voices.end())
+        return (true);
+    return (false);
+}
+
 bool Channel::isBan(std::string username)
 {
     if (this->_banList.find(username) != this->_banList.end())

@@ -1,4 +1,3 @@
-
 #include "main.hpp"
 
 void mode_o(Server *serv, Channel *channel, std::string mode, std::string buffer, int sd)
@@ -117,47 +116,47 @@ void mode_b(Server *serv, Channel *channel, std::string mode, std::string buffer
 	}
 }
 
-void mode_k(Server *serv, Channel *channel, std::string mode, std::string buffer, int sd)
-{
-    (void)mode;
-    (void)sd;
-    (void)serv;
-    int i = 0;
-    for (int j = 0;buffer[i] && j < 3; i++)
-        if (buffer[i] == ' ')
-            j++;
-    size_t ret1 = &buffer[i].find(' ');
-    std::string key;
-    if (ret1 < buffer.length() - 1)
-    {
-        key = buffer.substr(i, ret1 - i);
-    }
-    else
-    {
-        key = buffer.substr(i, (buffer.length() - 2) - i);
-    }
-    if (key.compare("x") == 0)
-    {
-        sendMessage(send_rpl_err(467, serv, FIND_USER(sd), channel->getKey(), ""), sd);
-    }
-    else
-    {
-        channel->setKey(key);
-    }
-}
+// void mode_k(Server *serv, Channel *channel, std::string mode, std::string buffer, int sd)
+// {
+//     (void)mode;
+//     (void)sd;
+//     (void)serv;
+//     int i = 0;
+//     for (int j = 0;buffer[i] && j < 3; i++)
+//         if (buffer[i] == ' ')
+    //         j++;
+    // size_t ret1 = &buffer[i].find(' ');
+    // std::string key;
+    // if (ret1 < buffer.length() - 1)
+    // {
+    //     key = buffer.substr(i, ret1 - i);
+    // }
+    // else
+    // {
+    //     key = buffer.substr(i, (buffer.length() - 2) - i);
+    // }
+    // if (key.compare("x") == 0)
+    // {
+    //     sendMessage(send_rpl_err(467, serv, FIND_USER(sd), channel->getKey(), ""), sd);
+//     }
+//     else
+//     {
+//         channel->setKey(key);
+//     }
+// }
 
-void mode_l(Server *serv, Channel *channel, std::string mode, std::string buffer, int sd)
-{
-    (void)mode;
-    (void)sd;
-    (void)serv;
-    int i = 0;
-    for (int j = 0;buffer[i] && j < 3; i++)
-        if (buffer[i] == ' ')
-            j++;
-    std::string name = buffer.substr(i, (buffer.length() - 2) - i);
-    channel->setMaxUser(std::stoi(name));
-}
+// void mode_l(Server *serv, Channel *channel, std::string mode, std::string buffer, int sd)
+// {
+//     (void)mode;
+//     (void)sd;
+//     (void)serv;
+//     int i = 0;
+//     for (int j = 0;buffer[i] && j < 3; i++)
+//         if (buffer[i] == ' ')
+//             j++;
+//     std::string name = buffer.substr(i, (buffer.length() - 2) - i);
+//     channel->setMaxUser(std::stoi(name));
+// }
 
 bool availableMode(char c, std::string availableMode)
 {
@@ -178,8 +177,8 @@ void channelMode(Server *serv, Channel *channel, std::string mode, int sd, char 
 
 	// modehandler.insert(std::make_pair('e', &mode_e));
 	// modehandler.insert(std::make_pair('I', &mode_I));
-    modehandler.insert(std::make_pair('k', &mode_k));
-    modehandler.insert(std::make_pair('l', &mode_l));
+    // modehandler.insert(std::make_pair('k', &mode_k));
+    // modehandler.insert(std::make_pair('l', &mode_l));
 
     if (mode[0] == '-')
     {
@@ -200,7 +199,7 @@ void channelMode(Server *serv, Channel *channel, std::string mode, int sd, char 
         std::string user_answer = user_output(FIND_USER(sd));
         if (!deletedMode.empty())
             user_answer += "MODE " + channel->getChannelname() + " -" + deletedMode;
-        sendMessage(user_answer, sd);
+        sendEveryone(user_answer, channel);
     }
     else
     {
@@ -220,7 +219,7 @@ void channelMode(Server *serv, Channel *channel, std::string mode, int sd, char 
         std::string user_answer = user_output(FIND_USER(sd));
         if (!addedMode.empty())
             user_answer += "MODE " + channel->getChannelname() + " +" + addedMode;
-        sendMessage(user_answer, sd);
+        sendEveryone(user_answer, channel);
     }
 }
 

@@ -51,6 +51,7 @@ class Channel
     std::string get_list_of_user_in_chan();
     std::string get_list_of_user_ban();
     bool isChanop(int sd);
+    bool isVoices(int sd);
     bool isBan(std::string username);
     bool isException(std::string username);
     bool isWhiteList(std::string username);
