@@ -38,6 +38,7 @@ class User;
 class Channel;
 
 std::string user_output(User *user);
+std::string anonymous_output();
 void sendMessage(std::string message, int sd);
 void sendEveryone(std::string message, Channel *chan);
 void sendEveryone(std::string message, Channel *chan, int sd);

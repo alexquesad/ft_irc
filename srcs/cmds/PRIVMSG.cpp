@@ -9,7 +9,11 @@ void privmsg(Server *serv, char *buffer, int sd)
     std::string idOfChannel = "#&+";
 
     int userToSendSd;
-    std::string user_answer = user_output(FIND_USER(sd));
+    std::string user_answer;
+    if (FIND_CHANNEL(msgtarget)->getMode().find("a") != std::string::npos)
+        user_answer = anonymous_output();
+    else
+        user_answer = user_output(FIND_USER(sd));
     user_answer += buffer;
     if (!msgtarget.empty() && idOfChannel.find(msgtarget[0]) != std::string::npos)
     {

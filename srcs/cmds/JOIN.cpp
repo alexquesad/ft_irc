@@ -106,5 +106,11 @@ void join(Server *serv, char *buffer, int sd)
         std::string list_of_user = FIND_CHANNEL(channel_name)->get_list_of_user_in_chan();
         sendMessage(send_rpl_err(353, serv, FIND_USER(sd), channel_name, list_of_user), sd);
         sendMessage(send_rpl_err(366, serv, FIND_USER(sd), channel_name, ""), sd);
+        if (!FIND_CHANNEL(channel_name)->getMode().empty())
+        {
+            user_answer = user_output(FIND_USER(sd));
+            user_answer += "MODE " + FIND_CHANNEL(channel_name)->getChannelname() + " +" + FIND_CHANNEL(channel_name)->getMode();
+            sendMessage(user_answer, sd);
+        }
     }
 }
