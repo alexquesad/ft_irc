@@ -1,3 +1,4 @@
+
 #include "main.hpp"
 
 void mode_o(Server *serv, Channel *channel, std::string mode, std::string buffer, int sd)
@@ -118,6 +119,9 @@ void mode_b(Server *serv, Channel *channel, std::string mode, std::string buffer
 
 void mode_k(Server *serv, Channel *channel, std::string mode, std::string buffer, int sd)
 {
+    (void)mode;
+    (void)sd;
+    (void)serv;
     int i = 0;
     for (int j = 0;buffer[i] && j < 3; i++)
         if (buffer[i] == ' ')
@@ -125,17 +129,28 @@ void mode_k(Server *serv, Channel *channel, std::string mode, std::string buffer
     size_t ret1 = &buffer[i].find(' ');
     std::string key;
     if (ret1 < buffer.length() - 1)
+    {
         key = buffer.substr(i, ret1 - i);
+    }
     else
-        key = buffer.substr(i, (buffer.length() - 2) - i)
+    {
+        key = buffer.substr(i, (buffer.length() - 2) - i);
+    }
     if (key.compare("x") == 0)
-        sendMessage(send_rpl_err(467, serv, FIND_USER(sd), channel->getChannelkey(), ""), sd);
+    {
+        sendMessage(send_rpl_err(467, serv, FIND_USER(sd), channel->getKey(), ""), sd);
+    }
     else
+    {
         channel->setKey(key);
+    }
 }
 
 void mode_l(Server *serv, Channel *channel, std::string mode, std::string buffer, int sd)
 {
+    (void)mode;
+    (void)sd;
+    (void)serv;
     int i = 0;
     for (int j = 0;buffer[i] && j < 3; i++)
         if (buffer[i] == ' ')

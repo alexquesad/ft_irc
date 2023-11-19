@@ -36,8 +36,7 @@ void kick(Server *serv, char *buffer, int sd)
                 user_answer = user_output(FIND_USER(userToKickSd));
                 user_answer += "PART " + channel_name + "\r\n";
                 sendMessage(user_answer, userToKickSd);
-            }
-            
+            } 
         }
         buf.erase(0, buf.find("\r\n") + 2);
     }

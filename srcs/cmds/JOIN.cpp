@@ -19,22 +19,9 @@ bool channelNameInvalid(std::string name)
     return (it == name.end());
 }
 
-// int count_keys(std::string str, int nb_of_channels)
-// {
-//     int i = 0;
-//     int result = nb_of_channels;
-//     while (str.find(",x", i) != std::string::npos)
-//     {
-//         result--;
-//         i += str.find(",x", i) + 1;
-//     }
-//     return (result);
-// }
-
 void join(Server *serv, char *buffer, int sd)
 {
     int i = 0, j = 0;
-    // int nb_of_keys = 0;
     std::string buf(buffer);
     for (; buf[5 + i] && buf[5 + i] != ' ' && buf[5 + i] != '\r' && buf[5 + i] != '\n'; i++);
     std::string channels_name(buf.substr(5, i));
@@ -50,9 +37,6 @@ void join(Server *serv, char *buffer, int sd)
         for (; buf[6 + i + j] && buf[6 + i + j] != ' ' && buf[6 + i + j] != '\r' && buf[6 + i + j] != '\n'; j++);
         keys_for_channels = buf.substr(6 + i, j);
     }
-    // if (!keys_for_channels.empty())
-    //     nb_of_keys = count_keys(keys_for_channels, nb_of_channels); 
-    //IMPORTANT ASSOCIATE KEYS WITH PRIVATE CHANNELS
     for (int i = 0; i < nb_of_channels; i++)
     {
         std::string channel_name = channels_name.substr(0, channels_name.find(","));
