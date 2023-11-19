@@ -116,6 +116,34 @@ void mode_b(Server *serv, Channel *channel, std::string mode, std::string buffer
 	}
 }
 
+void mode_k(Server *serv, Channel *channel, std::string mode, std::string buffer, int sd)
+{
+    int i = 0;
+    for (int j = 0;buffer[i] && j < 3; i++)
+        if (buffer[i] == ' ')
+            j++;
+    size_t ret1 = &buffer[i].find(' ');
+    std::string key;
+    if (ret1 < buffer.length() - 1)
+        key = buffer.substr(i, ret1 - i);
+    else
+        key = buffer.substr(i, (buffer.length() - 2) - i)
+    if (key.compare("x") == 0)
+        sendMessage(send_rpl_err(467, serv, FIND_USER(sd), channel->getChannelkey(), ""), sd);
+    else
+        channel->setKey(key);
+}
+
+void mode_l(Server *serv, Channel *channel, std::string mode, std::string buffer, int sd)
+{
+    int i = 0;
+    for (int j = 0;buffer[i] && j < 3; i++)
+        if (buffer[i] == ' ')
+            j++;
+    std::string name = buffer.substr(i, (buffer.length() - 2) - i);
+    channel->setMaxUser(std::stoi(name));
+}
+
 bool availableMode(char c, std::string availableMode)
 {
     return (!(availableMode.find(c) == std::string::npos));
@@ -132,8 +160,11 @@ void channelMode(Server *serv, Channel *channel, std::string mode, int sd, char 
 	modehandler.insert(std::make_pair('o', &mode_o));
 	modehandler.insert(std::make_pair('v', &mode_v));
 	modehandler.insert(std::make_pair('b', &mode_b));
+
 	// modehandler.insert(std::make_pair('e', &mode_e));
 	// modehandler.insert(std::make_pair('I', &mode_I));
+    modehandler.insert(std::make_pair('k', &mode_k));
+    modehandler.insert(std::make_pair('l', &mode_l));
 
     if (mode[0] == '-')
     {
@@ -143,9 +174,7 @@ void channelMode(Server *serv, Channel *channel, std::string mode, int sd, char 
             if (availableMode(mode[i], CHANNEL_MODE) == false)
                 sendMessage(send_rpl_err(501, serv, FIND_USER(sd), "", ""), sd);
             else if (availableMode(mode[i], "ovbeI") == true)
-            {
                 modehandler[mode[i]](serv, channel, mode, buffer, sd);
-            }
             else if (channelMode.find(mode[i]) != std::string::npos)
             {
                 deletedMode += mode[i];
