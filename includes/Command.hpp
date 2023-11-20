@@ -15,5 +15,6 @@ void topic(Server *serv, char *buffer, int sd);
 void kick(Server *serv, char *buffer, int sd);
 void mode(Server *serv, char *buffer, int sd);
 void oper(Server *serv, char *buffer, int sd);
+void kill(Server *serv, char *buffer, int sd);
 
 #endif

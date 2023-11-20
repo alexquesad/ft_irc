@@ -34,6 +34,7 @@ class Server{
 	std::string receiveMessage() const;
 	std::string getServername() const;
 	std::string getPort() const;
+	struct sockaddr_in getServer();
 	void setChannels(std::string channel_name, Channel *chan);
 	void setUsers(int sd, User *user);
 	int searchUserByNickname(std::string nickname);

@@ -14,6 +14,7 @@ SRCS =	srcs/main.cpp\
 		srcs/cmds/PINGPONG.cpp\
 		srcs/cmds/TOPIC.cpp\
 		srcs/cmds/KICK.cpp\
+		srcs/cmds/KILL.cpp\
 		srcs/cmds/OPER.cpp\
 		srcs/cmds/MODE.cpp
 

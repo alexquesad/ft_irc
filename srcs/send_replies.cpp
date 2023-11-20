@@ -87,9 +87,9 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
         case 381:
             ret += RPL_YOUREOPER;
 			break;
-        // case 401:
-        //     ret += ERR_NOSUCHNICK(user->getNickname());
-		// 	break;
+        case 401:
+            ret += ERR_NOSUCHNICK(args);
+			break;
         // case 402:
         //     ret += ERR_NOSUCHSERVER;
 		// 	break;

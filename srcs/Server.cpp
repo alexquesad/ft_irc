@@ -1,7 +1,4 @@
-
 #include "main.hpp"
-
-#define max_clients 10
 
 int client_socket[max_clients];
 
@@ -17,6 +14,7 @@ Server::Server(const std::string &port, const std::string &password) : _port(por
 	this->_commandhandler.insert(std::make_pair("KICK", &kick));
 	this->_commandhandler.insert(std::make_pair("MODE", &mode));
 	this->_commandhandler.insert(std::make_pair("OPER", &oper));
+	this->_commandhandler.insert(std::make_pair("kill", &kill));
 }
 
 Server::~Server(){close(this->_sockserver);}
@@ -197,29 +195,9 @@ void Server::connectToServer()
 						{
 							//Somebody disconnected , get his details and print
 							getpeername(sd , (struct sockaddr*)&server, &csize);
-							//remove user to the map but how to find the nick ? Maybe replace the nick by the fd in the map
-							for (std::map<int, User*>::iterator it = this->_users.begin(); it != this->_users.end(); it++)
-							{
-								if (it->first == sd)
-								{
-									// pour chaque channel dans user effacer ce user dans le channel;
-									std::set<std::string> channel_of_user = it->second->getChannels();
-									std::cout << "%" << *(it->second) << std::endl;
-									for (std::set<std::string>::iterator itt = channel_of_user.begin(); itt != channel_of_user.end(); itt++)
-									{
-										this->_channels.find(*itt)->second->leftUser(sd);
-										if (this->_channels.find(*itt)->second->getUsersnumber() == 0)
-											this->_channels.erase(*itt);
-										this->getUsers().find(sd)->second->getChannels().clear();
-									}
-									this->_users.erase(it);
-									// delete it->second;
-									break;
-								}
-							}
-							std::cout << "Host disconnected , ip " << inet_ntoa(server.sin_addr) << " , port " << ntohs(server.sin_port) << " , number of users: " <<  this->_users.size() << std::endl;
+							disconnectUser(this, sd);
 							//Close the socket and mark as 0 in list for reuse
-							close(sd);
+							// close(sd);
 							client_socket[i] = 0;
 						}
 						//Echo back the message that came in
@@ -299,6 +277,11 @@ std::map<std::string, Channel*> & Server::getChannels()
 std::map<int, User*> & Server::getUsers()
 {
 	return this->_users;
+}
+
+struct sockaddr_in Server::getServer()
+{
+	return this->server;
 }
 
 void Server::setChannels(std::string channel_name, Channel *chan)

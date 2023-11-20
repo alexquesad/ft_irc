@@ -57,7 +57,7 @@ void kick(Server *serv, char *buffer, int sd)
                 serv->getChannels().erase(serv->getChannels().find(channel_name)->first);
             FIND_USER(userToKickSd)->getChannels().erase(channel_name);
             user_answer = user_output(FIND_USER(userToKickSd));
-            user_answer += "PART " + channel_name + "\r\n";
+            user_answer += "PART " + channel_name;
             sendMessage(user_answer, userToKickSd);
         }
         buf.erase(0, buf.find("\r\n") + 2);
