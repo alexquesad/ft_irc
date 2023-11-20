@@ -16,6 +16,5 @@ std::string user_output(User *user)
 
 std::string anonymous_output()
 {
-    std::string output = ":anonymous!anonymous@anonymous";
-    return (output);
+    return (":anonymous!anonymous@anonymous ");
 }

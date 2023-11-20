@@ -18,9 +18,6 @@ class Channel
     std::string _key;
     int _maxUser;
     std::map<std::string, std::string> _banList;
-    std::set<std::string> _exceptionList;
-    std::set<std::string> _whiteList;
-    std::set<std::string> _inviteList;
 
     public:
 

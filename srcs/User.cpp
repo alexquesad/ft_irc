@@ -5,7 +5,10 @@ int max_clients = 10;
 User::User(std::string nickname, std::string username, std::string hostname, std::string real_name) : _nickname(nickname), _username(username), _hostname(hostname), _real_name(real_name){
 }
 
-User::~User(){}
+User::~User()
+{
+    this->_channels.clear();
+}
 
 std::string User::getNickname() const
 {

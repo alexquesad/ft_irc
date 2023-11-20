@@ -26,10 +26,17 @@ void kick(Server *serv, char *buffer, int sd)
                 sendMessage(send_rpl_err(403, serv, FIND_USER(sd), channel_name, ""), sd);
                 continue;
             }
+            if (FIND_CHANNEL(channel_name)->getMode().find("a") != std::string::npos)
+                continue;
             if (FIND_CHANNEL(channel_name)->searchUserByNickname(FIND_USER(sd)->getNickname()) == -1)
             {
                 sendMessage(send_rpl_err(442, serv, FIND_USER(sd), channel_name, ""), sd);
                 continue;
+            }
+            if (FIND_USER(sd)->getMode().find('r') != std::string::npos)
+            {
+                sendMessage(send_rpl_err(484, serv, FIND_USER(sd), "", ""), sd);
+                continue ;
             }
             if (!FIND_CHANNEL(channel_name)->isChanop(sd))
             {

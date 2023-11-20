@@ -1,3 +1,4 @@
+
 #ifndef USER_HPP
 # define USER_HPP
 
@@ -26,7 +27,6 @@ class User{
 	void add_channel(std::string channel_name);
 	void setNick(std::string new_nickname);
 	void setMode(std::string mode);
-	// bool Is_oper() const;
 
 };
 

@@ -38,6 +38,7 @@ class Server{
 	void setUsers(int sd, User *user);
 	int searchUserByNickname(std::string nickname);
 	void new_connection(void);
+	void clearAll();
 
 };
 

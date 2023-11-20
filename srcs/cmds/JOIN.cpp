@@ -66,14 +66,6 @@ void join(Server *serv, char *buffer, int sd)
                 continue;
             }
         }
-        if (FIND_CHANNEL(channel_name)->getMode().find("i") != std::string::npos)
-        {
-            if ((FIND_CHANNEL(channel_name)->isInvited(FIND_USER(sd)->getUsername()) == false) || (FIND_CHANNEL(channel_name)->isWhiteList(FIND_USER(sd)->getUsername()) == false))
-            {
-                sendMessage(send_rpl_err(473, serv, FIND_USER(sd), channel_name, ""), sd);
-                continue;
-            }
-        }
         if (FIND_CHANNEL(channel_name)->getMode().find("k") != std::string::npos)
         {
             if (FIND_CHANNEL(channel_name)->getKey().compare(key) != 0)
@@ -98,19 +90,19 @@ void join(Server *serv, char *buffer, int sd)
         FIND_USER(sd)->add_channel(channel_name);
         std::string user_answer = user_output(FIND_USER(sd));
         user_answer += buffer;
-        sendEveryone(user_answer, FIND_CHANNEL(channel_name));
+        if (FIND_CHANNEL(channel_name)->getMode().find("a") == std::string::npos)
+            sendEveryone(user_answer, FIND_CHANNEL(channel_name));
         if (FIND_CHANNEL(channel_name)->getTopic() == "")
             sendMessage(send_rpl_err(331, serv, FIND_USER(sd), channel_name, ""), sd);
         else
             sendMessage(send_rpl_err(332, serv, FIND_USER(sd), channel_name, FIND_CHANNEL(channel_name)->getTopic()), sd);
         std::string list_of_user = FIND_CHANNEL(channel_name)->get_list_of_user_in_chan();
-        sendMessage(send_rpl_err(353, serv, FIND_USER(sd), channel_name, list_of_user), sd);
-        sendMessage(send_rpl_err(366, serv, FIND_USER(sd), channel_name, ""), sd);
-        if (!FIND_CHANNEL(channel_name)->getMode().empty())
+        if (FIND_CHANNEL(channel_name)->getMode().find("a") == std::string::npos)
         {
-            user_answer = user_output(FIND_USER(sd));
-            user_answer += "MODE " + FIND_CHANNEL(channel_name)->getChannelname() + " +" + FIND_CHANNEL(channel_name)->getMode();
-            sendMessage(user_answer, sd);
+            sendMessage(send_rpl_err(353, serv, FIND_USER(sd), channel_name, list_of_user), sd);
+            sendMessage(send_rpl_err(366, serv, FIND_USER(sd), channel_name, ""), sd);
         }
+        if (!FIND_CHANNEL(channel_name)->getMode().empty())
+            sendMessage(send_rpl_err(324, serv, FIND_USER(sd), channel_name, FIND_CHANNEL(channel_name)->getMode()), sd);
     }
 }

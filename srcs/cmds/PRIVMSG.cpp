@@ -3,17 +3,20 @@
 void privmsg(Server *serv, char *buffer, int sd)
 {
     int i = 0;
+    int occAfterCmd;
     std::string buf(buffer);
-    for (; buf[8 + i] && buf[8 + i] != ' ' && buf[8 + i] != '\r' && buf[8 + i] != '\n';i++);
-    std::string msgtarget(buf.substr(8, i));
+    if (buf.compare(0, 6, "NOTICE") == 0)
+        occAfterCmd = 7;
+    else
+        occAfterCmd = 8;
+    for (; buf[occAfterCmd + i] && buf[occAfterCmd + i] != ' ' && buf[occAfterCmd + i] != '\r' && buf[occAfterCmd + i] != '\n';i++);
+    std::string msgtarget(buf.substr(occAfterCmd, i));
     std::string idOfChannel = "#&+";
 
     int userToSendSd;
     std::string user_answer;
-    if (FIND_CHANNEL(msgtarget)->getMode().find("a") != std::string::npos)
-        user_answer = anonymous_output();
-    else
-        user_answer = user_output(FIND_USER(sd));
+    std::cout << msgtarget << std::endl;
+    user_answer = user_output(FIND_USER(sd));
     user_answer += buffer;
     if (!msgtarget.empty() && idOfChannel.find(msgtarget[0]) != std::string::npos)
     {
@@ -25,6 +28,11 @@ void privmsg(Server *serv, char *buffer, int sd)
             sendMessage(send_rpl_err(404, serv, FIND_USER(sd), msgtarget, ""), sd);
 		else if (FIND_CHANNEL(msgtarget)->isBan(FIND_USER(sd)->getNickname()) == true || FIND_CHANNEL(msgtarget)->isBan(FIND_USER(sd)->getUsername()) == true || FIND_CHANNEL(msgtarget)->isBan(FIND_USER(sd)->getHostname()) == true)
             sendMessage(send_rpl_err(404, serv, FIND_USER(sd), msgtarget, ""), sd);
+        if ((FIND_CHANNEL(msgtarget)->getMode().find("a") != std::string::npos))
+        {
+            user_answer = anonymous_output() + buffer;
+            sendEveryone(user_answer, FIND_CHANNEL(msgtarget), sd);
+        }
         else
             sendEveryone(user_answer, FIND_CHANNEL(msgtarget), sd);
     }

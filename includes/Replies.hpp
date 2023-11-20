@@ -48,8 +48,8 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
     (":End of LIST")
 
 //324
-# define RPL_CHANNELMODEIS(channel) \
-    (channel + " <mode> <mode params>")
+# define RPL_CHANNELMODEIS(channel, modes) \
+    (channel + " " + modes)
 
 //331
 # define RPL_NOTOPIC(channel) \
@@ -213,9 +213,17 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
 # define ERR_BADCHANMASK(channel) \
     (channel + " :Bad Channel Mask")
 
+//481
+# define ERR_NOPRIVILEGES \
+    (":Permission Denied- You're not an IRC operator")
+
 //482
 # define ERR_CHANOPRIVSNEEDED(channel) \
     (channel + " :You're not channel operator")
+
+//484
+# define ERR_RESTRICTED \
+    (":Your connection is restricted!")
 
 //501
 # define ERR_UMODEUNKNOWNFLAG \

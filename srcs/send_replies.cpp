@@ -48,9 +48,9 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
         // case 323:
         //     ret += RPL_LISTEND;
 		// 	break;
-        // case 324:
-        //     ret += RPL_CHANNELMODEIS;
-		// 	break;
+        case 324:
+            ret += RPL_CHANNELMODEIS(args, args2);
+			break;
         case 331:
             ret += RPL_NOTOPIC(args);
 			break;
@@ -84,9 +84,9 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
         // case 376:
         //     ret += RPL_ENDOFMOTD;
 		// 	break;
-        // case 381:
-        //     ret += RPL_YOUREOPER;
-		// 	break;
+        case 381:
+            ret += RPL_YOUREOPER;
+			break;
         // case 401:
         //     ret += ERR_NOSUCHNICK(user->getNickname());
 		// 	break;
@@ -147,9 +147,9 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
         // case 462:
         //     ret += ERR_ALREADYREGISTRED;
 		// 	break;
-        // case 464:
-        //     ret += ERR_PASSWDMISMATCH;
-		// 	break;
+        case 464:
+            ret += ERR_PASSWDMISMATCH;
+			break;
         // case 467:
         //     ret += ERR_KEYSET;
 		// 	break;
@@ -171,8 +171,14 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
         // case 476:
         //     ret += ERR_BADCHANMASK;
 		// 	break;
+        case 481:
+            ret += ERR_NOPRIVILEGES;
+            break;
         case 482:
             ret += ERR_CHANOPRIVSNEEDED(args);
+			break;
+        case 484:
+            ret += ERR_RESTRICTED;
 			break;
         case 501:
             ret += ERR_UMODEUNKNOWNFLAG;

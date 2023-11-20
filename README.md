@@ -8,6 +8,7 @@ The server will be capable of managing channels, users, private messages, and IR
 
 ## Resources
 
+* https://www.geeksforgeeks.org/socket-programming-in-cc-handling-multiple-clients-on-server-without-multi-threading/?ref=lbp
 * https://beej.us/guide/bgnet/pdf/bgnet_a4_c_1.pdf
 * http://chi.cs.uchicago.edu/chirc/irc.html#the-irc-protocol
 * https://modern.ircdocs.horse/#mode-message

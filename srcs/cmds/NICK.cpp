@@ -42,6 +42,11 @@ void nick(Server *serv, char *buffer, int sd)
         sendMessage(send_rpl_err(431, serv, FIND_USER(sd), "", ""), sd);
         return ;
     }
+    if (FIND_USER(sd)->getMode().find('r') != std::string::npos)
+    {
+        sendMessage(send_rpl_err(484, serv, FIND_USER(sd), "", ""), sd);
+        return ;
+    }
     if (!nickname_is_valid(new_nickname))
     {
         sendMessage(send_rpl_err(432, serv, FIND_USER(sd), new_nickname, ""), sd);

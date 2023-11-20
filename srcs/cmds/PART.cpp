@@ -19,7 +19,10 @@ void    part(Server *serv, char *buffer, int sd)
         {
             std::string user_answer = user_output(FIND_USER(sd));
             user_answer += buffer;
-            sendEveryone(user_answer, FIND_CHANNEL(channel_name));
+            if (FIND_CHANNEL(channel_name)->getMode().find("a") == std::string::npos)
+                sendEveryone(user_answer, FIND_CHANNEL(channel_name));
+            else
+                sendMessage(user_answer, sd);
             FIND_CHANNEL(channel_name)->leftUser(sd);
             if (FIND_CHANNEL(channel_name)->getUsersnumber() == 0)
                 serv->getChannels().erase(serv->getChannels().find(channel_name)->first);

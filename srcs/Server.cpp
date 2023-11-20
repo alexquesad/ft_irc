@@ -1,3 +1,4 @@
+
 #include "main.hpp"
 
 #define max_clients 10
@@ -5,17 +6,17 @@
 int client_socket[max_clients];
 
 Server::Server(const std::string &port, const std::string &password) : _port(port), _password(password), _server_name(){
-	this->_sockserver = newSocket();
 	this->_commandhandler.insert(std::make_pair("NICK", &nick));
 	this->_commandhandler.insert(std::make_pair("JOIN", &join));
 	this->_commandhandler.insert(std::make_pair("PRIVMSG", &privmsg));
+	this->_commandhandler.insert(std::make_pair("NOTICE", &privmsg));
 	this->_commandhandler.insert(std::make_pair("PING", &ping));
 	this->_commandhandler.insert(std::make_pair("PONG", &pong));
 	this->_commandhandler.insert(std::make_pair("PART", &part));
 	this->_commandhandler.insert(std::make_pair("TOPIC", &topic));
 	this->_commandhandler.insert(std::make_pair("KICK", &kick));
 	this->_commandhandler.insert(std::make_pair("MODE", &mode));
-	// this->_commandhandler.insert(std::make_pair("MODE", &mode));
+	this->_commandhandler.insert(std::make_pair("OPER", &oper));
 }
 
 Server::~Server(){close(this->_sockserver);}
@@ -139,15 +140,18 @@ void Server::new_connection(void)
 
 void Server::connectToServer()
 {
+	this->_sockserver = newSocket();
 	fd_set readfds;
 	int sd, activity, max_sd;
+	int loop = 1;
+	bool is_restart = false;
 	for (int i = 0; i < max_clients; i++)
     {
         client_socket[i] = 0;
     }
 	socklen_t csize = sizeof(server);
 	std::cout << "listening..." << std::endl;
-	while (1)
+	while (loop == 1)
 	{
 		//clear the socket set
         FD_ZERO(&readfds);
@@ -223,9 +227,30 @@ void Server::connectToServer()
 						{
 							std::string command(buffer);
 							command = command.substr(0, command.find(' '));
-							// std::cout << "MY NICK: " << command << std::endl;
-							if (_commandhandler.find(command) != _commandhandler.end())
+							if (command.compare(0, 7, "restart") == 0)
+							{
+								if (this->_users.find(sd)->second->getMode().find('o') == std::string::npos)
+									sendMessage(send_rpl_err(481, this, this->_users.find(sd)->second, "", ""), sd);
+								else
+								{
+									loop = 0;
+									is_restart = true;
+									for (int u = 0; u < max_clients;u++)
+									{
+										if (client_socket[u] != 0)
+										{
+											close(client_socket[u]);
+											client_socket[u] = 0;
+										}
+
+									}
+									clearAll();
+								}
+							}
+							else if (_commandhandler.find(command) != _commandhandler.end())
+							{
 								(_commandhandler[command])(this, buffer, sd);
+							}
 							break;
 						}
 					}
@@ -234,6 +259,12 @@ void Server::connectToServer()
 		}
 	}
 	close(this->_sockserver);
+	if (is_restart == true)
+	{
+		is_restart = false;
+		std::cout << "SERVER RESTARTING..." << std::endl;
+		connectToServer();
+	}
 }
 
 std::string Server::receiveMessage() const
@@ -319,4 +350,14 @@ std::ostream	&operator<<(std::ostream &stdout, User &user)
         stdout << "Channel " << i << " of User " << user.getNickname() << " is called " << *it << std::endl;
     }
     return (stdout);
+}
+
+void Server::clearAll()
+{
+	for (std::map<int, User*>::iterator it = this->_users.begin(); it != this->_users.end(); it++)
+		delete it->second;
+	this->_users.clear();
+	for (std::map<std::string, Channel*>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+		delete it->second;
+	this->_channels.clear();
 }

@@ -3,7 +3,13 @@
 Channel::Channel(std::string channel_name) : _channel_name(channel_name), _topic("") {
 }
 
-Channel::~Channel(){}
+Channel::~Channel()
+{
+    this->_users.clear();
+    this->_chanops.clear();
+	this->_voices.clear();
+	this->_banList.clear();
+}
 
 int Channel::getUsersnumber() const
 {
@@ -38,21 +44,6 @@ std::map<int, User*> & Channel::getVoices()
 std::map<std::string, std::string> & Channel::getBanList()
 {
     return this->_banList;
-}
-
-std::set<std::string> & Channel::getExceptionList()
-{
-    return this->_exceptionList;
-}
-
-std::set<std::string> & Channel::getWhiteList()
-{
-    return this->_whiteList;
-}
-
-std::set<std::string> & Channel::getInviteList()
-{
-    return this->_inviteList;
 }
 
 std::string Channel::getMode() const
@@ -191,27 +182,6 @@ bool    Channel::isVoices(int sd)
 bool Channel::isBan(std::string username)
 {
     if (this->_banList.find(username) != this->_banList.end())
-        return (true);
-    return (false);
-}
-
-bool Channel::isException(std::string username)
-{
-    if (this->_exceptionList.find(username) != this->_exceptionList.end())
-        return (true);
-    return (false);
-}
-
-bool Channel::isWhiteList(std::string username)
-{
-    if (this->_whiteList.find(username) != this->_whiteList.end())
-        return (true);
-    return (false);
-}
-
-bool Channel::isInvited(std::string username)
-{
-    if (this->_inviteList.find(username) != this->_inviteList.end())
         return (true);
     return (false);
 }
