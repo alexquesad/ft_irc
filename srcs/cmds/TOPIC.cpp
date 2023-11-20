@@ -21,7 +21,7 @@ void topic(Server *serv, char *buffer, int sd)
     else
     {
         std::string topic(buf.substr(buf.find(':') + 1));
-        topic = topic.substr(0, topic.length() - 2);
+        topic = topic.substr(0, topic.find('\r') != std::string::npos ? topic.length() - 2 : topic.length() - 1);
         FIND_CHANNEL(channel_name)->setTopic(topic);
         sendMessage(send_rpl_err(332, serv, FIND_USER(sd), channel_name, FIND_CHANNEL(channel_name)->getTopic()), sd);
         std::string user_answer = user_output(FIND_USER(sd));

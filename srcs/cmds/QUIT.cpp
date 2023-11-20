@@ -13,7 +13,10 @@ void disconnectUser(Server* serv, int sd)
         sendEveryoneInChan(userAnswer, FIND_CHANNEL(*it));
         FIND_CHANNEL(*it)->leftUser(sd);
         if (FIND_CHANNEL(*it)->getUsersnumber() == 0)
+        {
+            delete serv->getChannels().find(*it)->second;
             serv->getChannels().erase(*it);
+        }
     }
     FIND_USER(sd)->getChannels().clear();
     delete FIND_USER(sd);

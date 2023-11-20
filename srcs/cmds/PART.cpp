@@ -30,7 +30,10 @@ void    part(Server *serv, char *buffer, int sd)
                 sendMessage(user_answer, sd);
             FIND_CHANNEL(channel_name)->leftUser(sd);
             if (FIND_CHANNEL(channel_name)->getUsersnumber() == 0)
-                serv->getChannels().erase(serv->getChannels().find(channel_name)->first);
+            {
+                delete serv->getChannels().find(channel_name)->second;
+                serv->getChannels().erase(channel_name);
+            }
             FIND_USER(sd)->getChannels().erase(channel_name);
         }
     }

@@ -1,25 +1,25 @@
 #include "main.hpp"
 
 int client_socket[max_clients];
+bool isAlive = true;
 
 Server::Server(const std::string &port, const std::string &password) : _port(port), _password(password), _server_name(), _isRestart(false){
-	this->_commandhandler.insert(std::make_pair("NICK", &nick));
-	this->_commandhandler.insert(std::make_pair("JOIN", &join));
-	this->_commandhandler.insert(std::make_pair("PRIVMSG", &privmsg));
-	this->_commandhandler.insert(std::make_pair("NOTICE", &privmsg));
-	this->_commandhandler.insert(std::make_pair("PING", &ping));
-	this->_commandhandler.insert(std::make_pair("PONG", &pong));
-	this->_commandhandler.insert(std::make_pair("PART", &part));
-	this->_commandhandler.insert(std::make_pair("TOPIC", &topic));
-	this->_commandhandler.insert(std::make_pair("KICK", &kick));
-	this->_commandhandler.insert(std::make_pair("MODE", &mode));
-	this->_commandhandler.insert(std::make_pair("OPER", &oper));
-	this->_commandhandler.insert(std::make_pair("kill", &kill));
-	this->_commandhandler.insert(std::make_pair("KILL", &kill));
-	this->_commandhandler.insert(std::make_pair("QUIT", &quit));
+	this->_commandhandler.insert(std::pair<std::string, command>("NICK", &nick));
+	this->_commandhandler.insert(std::pair<std::string, command>("JOIN", &join));
+	this->_commandhandler.insert(std::pair<std::string, command>("PRIVMSG", &privmsg));
+	this->_commandhandler.insert(std::pair<std::string, command>("NOTICE", &privmsg));
+	this->_commandhandler.insert(std::pair<std::string, command>("PING", &ping));
+	this->_commandhandler.insert(std::pair<std::string, command>("PONG", &pong));
+	this->_commandhandler.insert(std::pair<std::string, command>("PART", &part));
+	this->_commandhandler.insert(std::pair<std::string, command>("TOPIC", &topic));
+	this->_commandhandler.insert(std::pair<std::string, command>("KICK", &kick));
+	this->_commandhandler.insert(std::pair<std::string, command>("MODE", &mode));
+	this->_commandhandler.insert(std::pair<std::string, command>("OPER", &oper));
+	this->_commandhandler.insert(std::pair<std::string, command>("kill", &kill));
+	this->_commandhandler.insert(std::pair<std::string, command>("KILL", &kill));
+	this->_commandhandler.insert(std::pair<std::string, command>("QUIT", &quit));
 	// this->_commandhandler.insert(std::make_pair("RESTART", &restart));
 	// this->_commandhandler.insert(std::make_pair("restart", &restart));
-
 }
 
 Server::~Server(){close(this->_sockserver);}
@@ -142,8 +142,16 @@ void Server::new_connection(void)
 		sendMessage(send_rpl_err(005, this, NULL, nick, ""), this->_sockcom);
 }
 
+void    handler(int signum)
+{
+	(void)signum;
+	std::cout << "MDRRR" << std::endl;
+	isAlive = false;
+}
+
 void Server::connectToServer()
 {
+	std::cout << "test" << std::endl;
 	this->_sockserver = newSocket();
 	fd_set readfds;
 	int sd, activity, max_sd;
@@ -152,8 +160,10 @@ void Server::connectToServer()
         client_socket[i] = 0;
     }
 	std::cout << "listening..." << std::endl;
-	while (this->_isRestart == false)
+	while (this->_isRestart == false && isAlive == true)
 	{
+    	std::signal(SIGINT, handler);
+		// signal(SIGQUIT, SIG_IGN);
 		//clear the socket set
         FD_ZERO(&readfds);
         //add master socket to set
@@ -206,13 +216,15 @@ void Server::connectToServer()
 			}
 		}
 	}
+	clearAll();
 	close(this->_sockserver);
-	if (this->_isRestart == true)
-	{
-		this->_isRestart = false;
-		std::cout << "SERVER RESTARTING..." << std::endl;
-		connectToServer();
-	}
+	// if (this->_isRestart == true)
+	// {
+	// 	this->_isRestart = false;
+	// 	std::cout << "SERVER RESTARTING..." << std::endl;
+	// 	connectToServer();
+	// }
+
 }
 
 std::string Server::receiveMessage() const

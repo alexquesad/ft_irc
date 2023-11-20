@@ -9,13 +9,13 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include <csignal>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-
 #include "User.hpp"
 #include "Command.hpp"
 #include "Channel.hpp"

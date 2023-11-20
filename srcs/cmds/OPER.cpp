@@ -24,7 +24,7 @@ void oper(Server *serv, char *buffer, int sd)
         sendMessage(send_rpl_err(401, serv, FIND_USER(sd), user, ""), sd);
         return ;
     }
-    password = buf.substr(k, buf.length() - 2 - k);
+    password = buf.substr(k, buf.find('\r') != std::string::npos ? buf.length() - 2 - k : buf.length() - 1 - k);
     if (password.empty())
     {
         sendMessage(send_rpl_err(461, serv, FIND_USER(sd), "OPER", ""), sd);

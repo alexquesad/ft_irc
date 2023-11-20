@@ -1,3 +1,4 @@
+
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
@@ -22,14 +23,15 @@ class Server{
 	struct sockaddr_in server;
 	std::string _server_name;
 	bool _isRestart;
-
+	int newSocket();
+	void new_connection(void);
+	// void handler(int signum);
 	public:
 
 
 	Server(const std::string &port, const std::string &password);
 	~Server();
 	void connectToServer();
-	int newSocket();
 	std::map<std::string, Channel*> & getChannels();
 	std::map<int, User*> & getUsers() ;
 	std::string receiveMessage() const;
@@ -39,9 +41,9 @@ class Server{
 	void setChannels(std::string channel_name, Channel *chan);
 	void setUsers(int sd, User *user);
 	void setIsRestart();
+	void setIsAlive();
 	int searchUserByNickname(std::string nickname);
-	void new_connection(void);
-	void clearAll();
+	void clearAll(); //
 
 };
 

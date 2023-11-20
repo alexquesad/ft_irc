@@ -6,7 +6,7 @@ void mode_o(Server *serv, Channel *channel, std::string mode, std::string buffer
     for (int j = 0;buffer[i] && j < 3; i++)
         if (buffer[i] == ' ')
             j++;
-    std::string name = buffer.substr(i, (buffer.length() - 2) - i);
+    std::string name = buffer.substr(i, buffer.find('\r') != std::string::npos ? buffer.length() - 2 - i : buffer.length() - 1 - i);
     int userSd = channel->searchUserByNickname(name);
     if (userSd == -1)
     {
@@ -29,7 +29,7 @@ void mode_v(Server *serv, Channel *channel, std::string mode, std::string buffer
     for (int j = 0;buffer[i] && j < 3; i++)
         if (buffer[i] == ' ')
             j++;
-    std::string name = buffer.substr(i, (buffer.length() - 2) - i);
+    std::string name = buffer.substr(i, buffer.find('\r') != std::string::npos ? buffer.length() - 2 - i : buffer.length() - 1 - i);
     int userSd = channel->searchUserByNickname(name);
     if (userSd == -1)
     {
@@ -55,7 +55,7 @@ void mode_b(Server *serv, Channel *channel, std::string mode, std::string buffer
     for (int j = 0;buffer[i] && j < 3; i++)
         if (buffer[i] == ' ')
             j++;
-    std::string name = buffer.substr(i, (buffer.length() - 2) - i);
+    std::string name = buffer.substr(i, buffer.find('\r') != std::string::npos ? buffer.length() - 2 - i : buffer.length() - 1 - i);
     if (name.empty())
     {
         std::string banlist = channel->get_list_of_user_ban();
@@ -108,7 +108,7 @@ void mode_k(Server *serv, Channel *channel, std::string mode, std::string buffer
     }
     else
     {
-        key = buffer.substr(i, (buffer.length() - 2) - i);
+        key = buffer.substr(i, buffer.find('\r') != std::string::npos ? buffer.length() - 2 - i : buffer.length() - 1 - i);
     }
     if (key.compare("x") == 0)
     {
@@ -134,7 +134,7 @@ void mode_l(Server *serv, Channel *channel, std::string mode, std::string buffer
     for (int j = 0;buffer[i] && j < 3; i++)
         if (buffer[i] == ' ')
             j++;
-    std::string name = buffer.substr(i, (buffer.length() - 2) - i);
+    std::string name = buffer.substr(i, buffer.find('\r') != std::string::npos ? buffer.length() - 2 - i : buffer.length() - 1 - i);
     int maxUser = std::strtoul(name.c_str(), NULL, 0);
     if (maxUser < 0)
     {

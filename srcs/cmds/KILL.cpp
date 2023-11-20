@@ -11,7 +11,7 @@ void kill(Server *serv, char *buffer, int sd)
         sendMessage(send_rpl_err(481, serv, FIND_USER(sd), "", ""), sd);
         return ;
     }
-    name = buf.substr(buf.find(' ') + 1, buf.find(':') - buf.find(' ') - 2);
+    name = buf.substr(buf.find(' ') + 1, buf.find('\r') != std::string::npos ? buf.find(':') - buf.find(' ') - 2 : buf.find(':') - buf.find(' ') - 1);
     if (name.empty())
     {
         sendMessage(send_rpl_err(461, serv, FIND_USER(sd), "KILL", ""), sd);
@@ -27,5 +27,4 @@ void kill(Server *serv, char *buffer, int sd)
     for (; buf[i + j] && endBuf.find(buf[i + j]) == std::string::npos; j++);
     message = buf.substr(buf.find(':') + 1, j);
     disconnectUser(serv, serv->searchUserByNickname(name));
-    close(serv->searchUserByNickname(name));
 }
