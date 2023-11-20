@@ -34,9 +34,8 @@ void nick(Server *serv, char *buffer, int sd)
 {
     int i = 0;
     std::string buf(buffer);
-    for (; buf[5 + i] && buf[5 + i] != ' ' && buf[5 + i] != '\r' && buf[5 + i] != '\n';i++);
+    for (; buf[5 + i] && sep.find(buf[5 + i]) == std::string::npos;i++);
     std::string new_nickname(buf.substr(5, i));
-    std::cout << "[ " << new_nickname << " ]" << std::endl;
     if (new_nickname.empty())
     {
         sendMessage(send_rpl_err(431, serv, FIND_USER(sd), "", ""), sd);
@@ -59,7 +58,6 @@ void nick(Server *serv, char *buffer, int sd)
     }
     std::string user_answer = user_output(FIND_USER(sd));
     user_answer += buffer;
-    std::cout << user_answer << std::endl;
     sendMessage(user_answer, sd);
     FIND_USER(sd)->setNick(new_nickname);
 }

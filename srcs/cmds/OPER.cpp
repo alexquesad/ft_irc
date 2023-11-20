@@ -2,8 +2,6 @@
 
 void oper(Server *serv, char *buffer, int sd)
 {
-    (void)serv;
-    (void)sd;
     std::string buf(buffer);
     std::string password;
     std::string user;
@@ -16,13 +14,22 @@ void oper(Server *serv, char *buffer, int sd)
         if (buffer[k] == ' ')
             j++;
     user = buf.substr(i, k - i - 1);
+    if (user.empty())
+    {
+        sendMessage(send_rpl_err(461, serv, FIND_USER(sd), "OPER", ""), sd);
+        return;
+    }
     if (serv->searchUserByNickname(user) == -1)
     {
         sendMessage(send_rpl_err(401, serv, FIND_USER(sd), user, ""), sd);
         return ;
     }
     password = buf.substr(k, buf.length() - 2 - k);
-    // std::cout << "user: " << user << " password: " << password << std::endl;
+    if (password.empty())
+    {
+        sendMessage(send_rpl_err(461, serv, FIND_USER(sd), "OPER", ""), sd);
+        return;
+    }
     if (password.compare(OPER_PW) == 0)
     {
         std:: string user_answer = user_output(FIND_USER(serv->searchUserByNickname(user)));

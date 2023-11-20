@@ -21,6 +21,7 @@ class Server{
 	std::map<std::string, Channel*> _channels;
 	struct sockaddr_in server;
 	std::string _server_name;
+	bool _isRestart;
 
 	public:
 
@@ -37,6 +38,7 @@ class Server{
 	struct sockaddr_in getServer();
 	void setChannels(std::string channel_name, Channel *chan);
 	void setUsers(int sd, User *user);
+	void setIsRestart();
 	int searchUserByNickname(std::string nickname);
 	void new_connection(void);
 	void clearAll();

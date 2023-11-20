@@ -5,7 +5,6 @@ SRCS =	srcs/main.cpp\
 		srcs/User.cpp\
 		srcs/Channel.cpp\
 		srcs/send_replies.cpp\
-		srcs/utils.cpp\
 		srcs/send.cpp\
 		srcs/cmds/NICK.cpp\
 		srcs/cmds/JOIN.cpp\
@@ -15,7 +14,7 @@ SRCS =	srcs/main.cpp\
 		srcs/cmds/TOPIC.cpp\
 		srcs/cmds/KICK.cpp\
 		srcs/cmds/KILL.cpp\
-		srcs/camd/QUIT.cpp\
+		srcs/cmds/QUIT.cpp\
 		srcs/cmds/OPER.cpp\
 		srcs/cmds/MODE.cpp
 

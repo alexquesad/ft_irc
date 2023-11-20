@@ -4,7 +4,7 @@ void topic(Server *serv, char *buffer, int sd)
 {
     int i = 0;
     std::string buf(buffer);
-    for (; buf[6 + i] && buf[6 + i] != ' ' && buf[6 + i] != '\r' && buf[6 + i] != '\n';i++);
+    for (; buf[6 + i] && sep.find(buf[6 + i]) == std::string::npos;i++);
     std::string channel_name(buf.substr(6, i));
     if (channel_name.empty())
         sendMessage(send_rpl_err(461, serv, FIND_USER(sd), "TOPIC", ""), sd);
@@ -22,13 +22,12 @@ void topic(Server *serv, char *buffer, int sd)
     {
         std::string topic(buf.substr(buf.find(':') + 1));
         topic = topic.substr(0, topic.length() - 2);
-        std::cout << "[" << topic << "]" << std::endl;
         FIND_CHANNEL(channel_name)->setTopic(topic);
         sendMessage(send_rpl_err(332, serv, FIND_USER(sd), channel_name, FIND_CHANNEL(channel_name)->getTopic()), sd);
         std::string user_answer = user_output(FIND_USER(sd));
         if (FIND_CHANNEL(channel_name)->getMode().find("a") != std::string::npos)
             user_answer = anonymous_output();
         user_answer += buffer;
-        sendEveryone(user_answer, FIND_CHANNEL(channel_name));
+        sendEveryoneInChan(user_answer, FIND_CHANNEL(channel_name));
     }
 }

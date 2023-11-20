@@ -9,13 +9,12 @@ void privmsg(Server *serv, char *buffer, int sd)
         occAfterCmd = 7;
     else
         occAfterCmd = 8;
-    for (; buf[occAfterCmd + i] && buf[occAfterCmd + i] != ' ' && buf[occAfterCmd + i] != '\r' && buf[occAfterCmd + i] != '\n';i++);
+    for (; buf[occAfterCmd + i] && sep.find(buf[occAfterCmd + i]) == std::string::npos;i++);
     std::string msgtarget(buf.substr(occAfterCmd, i));
     std::string idOfChannel = "#&+";
 
     int userToSendSd;
     std::string user_answer;
-    std::cout << msgtarget << std::endl;
     user_answer = user_output(FIND_USER(sd));
     user_answer += buffer;
     if (!msgtarget.empty() && idOfChannel.find(msgtarget[0]) != std::string::npos)
@@ -31,10 +30,10 @@ void privmsg(Server *serv, char *buffer, int sd)
         if ((FIND_CHANNEL(msgtarget)->getMode().find("a") != std::string::npos))
         {
             user_answer = anonymous_output() + buffer;
-            sendEveryone(user_answer, FIND_CHANNEL(msgtarget), sd);
+            sendEveryoneInChanExceptUser(user_answer, FIND_CHANNEL(msgtarget), sd);
         }
         else
-            sendEveryone(user_answer, FIND_CHANNEL(msgtarget), sd);
+            sendEveryoneInChanExceptUser(user_answer, FIND_CHANNEL(msgtarget), sd);
     }
     else
     {

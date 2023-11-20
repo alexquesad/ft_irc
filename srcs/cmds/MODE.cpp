@@ -20,7 +20,7 @@ void mode_o(Server *serv, Channel *channel, std::string mode, std::string buffer
         channel->addChanops(userSd, FIND_USER(userSd));
     std::string user_answer = user_output(FIND_USER(sd));
     user_answer += buffer;
-    sendEveryone(user_answer, channel);
+    sendEveryoneInChan(user_answer, channel);
 }
 
 void mode_v(Server *serv, Channel *channel, std::string mode, std::string buffer, int sd)
@@ -45,7 +45,7 @@ void mode_v(Server *serv, Channel *channel, std::string mode, std::string buffer
         channel->addVoices(userSd, FIND_USER(userSd));
     std::string user_answer = user_output(FIND_USER(sd));
     user_answer += buffer;
-    sendEveryone(user_answer, channel);
+    sendEveryoneInChan(user_answer, channel);
 }
 
 void mode_b(Server *serv, Channel *channel, std::string mode, std::string buffer, int sd)
@@ -70,8 +70,6 @@ void mode_b(Server *serv, Channel *channel, std::string mode, std::string buffer
     {
         std::string full_name = name;
         std::string nick = full_name.substr(0, full_name.find('!'));
-	    std::string user = full_name.substr(full_name.find('!') + 1, full_name.find('@') - (full_name.find('!') + 1));
-	    std::string host = full_name.substr(full_name.find('@') + 1, full_name.length() - (full_name.find('@') + 1));
         if (nick.length() > 1 || (nick.length() == 1 && nick[0] != '*'))
         {
             if (nick[0] == '*')
@@ -79,29 +77,12 @@ void mode_b(Server *serv, Channel *channel, std::string mode, std::string buffer
             else
                 name = nick;
         }
-        else if (user.length() > 1 || (user.length() == 1 && user[0] != '*'))
-        {
-            if (user[0] == '*')
-                name = &user[1];
-            else
-                name = user;
-        }
-        else if (host.length() > 1 || (host.length() == 1 && host[0] != '*'))
-        {
-            if (host[0] == '*')
-                name = &host[1];
-            else
-                name = host;
-        }
         else
-        {
-            // aucun nick ni user ni hostname trouvé
-        }
-		std::cout << "name: " << name << std::endl;
+            return ;
         if (mode[0] == '-')
             channel->getBanList().erase(name);
         else
-            channel->getBanList().insert(std::make_pair(name, full_name));
+            channel->getBanList().insert(std::make_pair(name, full_name)); // is it working ?
 	}
 }
 
@@ -179,9 +160,6 @@ void channelMode(Server *serv, Channel *channel, std::string mode, int sd, char 
 	modehandler.insert(std::make_pair('o', &mode_o));
 	modehandler.insert(std::make_pair('v', &mode_v));
 	modehandler.insert(std::make_pair('b', &mode_b));
-
-	// modehandler.insert(std::make_pair('e', &mode_e));
-	// modehandler.insert(std::make_pair('I', &mode_I));
     modehandler.insert(std::make_pair('k', &mode_k));
     modehandler.insert(std::make_pair('l', &mode_l));
 
@@ -213,7 +191,7 @@ void channelMode(Server *serv, Channel *channel, std::string mode, int sd, char 
             user_answer = anonymous_output();
         if (!deletedMode.empty())
             user_answer += "MODE " + channel->getChannelname() + " -" + deletedMode;
-        sendEveryone(user_answer, channel);
+        sendEveryoneInChan(user_answer, channel);
     }
     else
     {
@@ -240,7 +218,7 @@ void channelMode(Server *serv, Channel *channel, std::string mode, int sd, char 
             user_answer = anonymous_output();
         if (!addedMode.empty())
             user_answer += "MODE " + channel->getChannelname() + " +" + addedMode;
-        sendEveryone(user_answer, channel);
+        sendEveryoneInChan(user_answer, channel);
     }
 }
 
@@ -307,18 +285,24 @@ void mode(Server *serv, char *buffer, int sd)
 {
     int i = 0;
     std::string buf(buffer);
-    for (; buf[5 + i] && buf[5 + i] != ' ' && buf[5 + i] != '\r' && buf[5 + i] != '\n';i++);
+    for (; buf[5 + i] && sep.find(buf[5 + i]) == std::string::npos;i++);
     std::string msgtarget(buf.substr(5, i));
+    if (msgtarget.empty())
+    {
+        sendMessage(send_rpl_err(461, serv, FIND_USER(sd), "MODE", ""), sd);
+        return;
+    }
     std::string idOfChannel = "#&+";
 
     std::string mode(&buf[i + 6]);
-    for (i = 0; mode[i] && mode[i] != ' ' && mode[i] != '\r' && mode[i] != '\n';i++);
+    for (i = 0; mode[i] && sep.find(mode[i]) == std::string::npos;i++);
     mode.erase(i, mode.length());
-    if (mode.empty())
-            sendMessage(send_rpl_err(221, serv, FIND_USER(sd), '+' + FIND_USER(sd)->getMode(), ""), sd);
+    if (mode.empty() && !FIND_USER(sd)->getMode().empty())
+        sendMessage(send_rpl_err(221, serv, FIND_USER(sd), '+' + FIND_USER(sd)->getMode(), ""), sd);
+    else if (mode.empty() && FIND_USER(sd)->getMode().empty())
+        sendMessage("You don't have any mode!", sd);
     else if (!msgtarget.empty() && idOfChannel.find(msgtarget[0]) != std::string::npos)
     {
-        std::cout << msgtarget << std::endl;
         if (serv->getChannels().find(msgtarget) == serv->getChannels().end())
             sendMessage(send_rpl_err(403, serv, FIND_USER(sd), msgtarget, ""), sd);
         else if (FIND_USER(sd)->getMode().find('r') != std::string::npos)

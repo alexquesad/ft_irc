@@ -5,18 +5,28 @@ void kick(Server *serv, char *buffer, int sd)
     std::string buf(buffer);
     int kickCount = std::count(buf.begin(), buf.end(), '\n');
     int i = 0;
-    for (; buf[5 + i] && buf[5 + i] != ' ' && buf[5 + i] != '\r' && buf[5 + i] != '\n'; i++);
+    for (; buf[5 + i] && sep.find(buf[i]) == std::string::npos; i++);
     std::string channels_name(buf.substr(5, i));
+    if (channels_name.empty())
+    {
+        sendMessage(send_rpl_err(461, serv, FIND_USER(sd), "KICK", ""), sd);
+        return;
+    }
     int nb_of_channels = 1 + std::count(channels_name.begin(), channels_name.end(), ',');
     int j = 0;
-    for (; buf[i] && buf[i] != ':' && buf[i] != '\r' && buf[i] != '\n'; i++);
-    for (; buf[i + j] && buf[i + j] != '\r' && buf[i + j] != '\n'; j++);
+    for (; buf[i] && buf[i] != ':' && endBuf.find(buf[i]) == std::string::npos; i++);
+    for (; buf[i + j] && endBuf.find(buf[i + j]) == std::string::npos; j++);
     std::string message = buf.substr(i + 1, j - 1);
     for (int k = 0; k < kickCount; k++)
     {
         j = i - 2;
         for (; (j >= 0) && buf[j] != ' '; j--);
         std::string user_nick = buf.substr((j + 1), (i - 2 - j));
+        if (user_nick.empty())
+        {
+            sendMessage(send_rpl_err(461, serv, FIND_USER(sd), "KICK", ""), sd);
+            return;
+        }
         for (int i = 0; i < nb_of_channels; i++)
         {
             std::string channel_name = channels_name.substr(0, channels_name.find(","));
@@ -51,7 +61,7 @@ void kick(Server *serv, char *buffer, int sd)
             }
             std::string user_answer = user_output(FIND_USER(sd));
             user_answer += buffer;
-            sendEveryone(user_answer, FIND_CHANNEL(channel_name), userToKickSd);
+            sendEveryoneInChanExceptUser(user_answer, FIND_CHANNEL(channel_name), userToKickSd);
             FIND_CHANNEL(channel_name)->leftUser(userToKickSd);
             if (FIND_CHANNEL(channel_name)->getUsersnumber() == 0)
                 serv->getChannels().erase(serv->getChannels().find(channel_name)->first);
@@ -60,6 +70,9 @@ void kick(Server *serv, char *buffer, int sd)
             user_answer += "PART " + channel_name;
             sendMessage(user_answer, userToKickSd);
         }
-        buf.erase(0, buf.find("\r\n") + 2);
+        if (buf.find('\r') != std::string::npos)
+            buf.erase(0, buf.find("\r\n") + 2);
+        else
+            buf.erase(0, buf.find('\n') + 1); // a check
     }
 }

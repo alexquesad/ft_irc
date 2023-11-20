@@ -15,6 +15,9 @@ bool channelNameInvalid(std::string name)
     if (name.size() > 50)
         return false;
     std::string::iterator it = name.begin();
+    std::string channelId = "#&+";
+    if (!name.empty() && channelId.find(name[0]) == std::string::npos)
+        return false;
     for (; it != name.end() && !checkInvalidCharacter(*it); it++);
     return (it == name.end());
 }
@@ -23,8 +26,13 @@ void join(Server *serv, char *buffer, int sd)
 {
     int i = 0, j = 0;
     std::string buf(buffer);
-    for (; buf[5 + i] && buf[5 + i] != ' ' && buf[5 + i] != '\r' && buf[5 + i] != '\n'; i++);
+    for (; buf[5 + i] && sep.find(buf[5 + i]) == std::string::npos; i++);
     std::string channels_name(buf.substr(5, i));
+    if (channels_name.empty())
+    {
+        sendMessage(send_rpl_err(461, serv, FIND_USER(sd), "JOIN", ""), sd);
+        return;
+    }
     // if (channels_name.compare("0"))
     // {
     //     leave_all_channels(serv, sd);
@@ -34,7 +42,7 @@ void join(Server *serv, char *buffer, int sd)
     std::string keys_for_channels = "";
     if (buf[5 + i] && buf[5 + i] == ' ')
     {
-        for (; buf[6 + i + j] && buf[6 + i + j] != ' ' && buf[6 + i + j] != '\r' && buf[6 + i + j] != '\n'; j++);
+        for (; buf[6 + i + j] && sep.find(buf[6 + j + i]) == std::string::npos; j++);
         keys_for_channels = buf.substr(6 + i, j);
     }
     for (int i = 0; i < nb_of_channels; i++)
@@ -68,6 +76,11 @@ void join(Server *serv, char *buffer, int sd)
         }
         if (FIND_CHANNEL(channel_name)->getMode().find("k") != std::string::npos)
         {
+            if (key.empty())
+            {
+                sendMessage(send_rpl_err(461, serv, FIND_USER(sd), "JOIN", ""), sd);
+                return;
+            }
             if (FIND_CHANNEL(channel_name)->getKey().compare(key) != 0)
             {
                 sendMessage(send_rpl_err(475, serv, FIND_USER(sd), channel_name, ""), sd);
@@ -82,7 +95,7 @@ void join(Server *serv, char *buffer, int sd)
                 continue;
             }
         }
-        //On ajoute le client a notre serveur
+        //Adding client to server
         if (FIND_CHANNEL(channel_name)->getUsersnumber() == 0)
             FIND_CHANNEL(channel_name)->addChanops(sd, FIND_USER(sd));
         else
@@ -91,7 +104,7 @@ void join(Server *serv, char *buffer, int sd)
         std::string user_answer = user_output(FIND_USER(sd));
         user_answer += buffer;
         if (FIND_CHANNEL(channel_name)->getMode().find("a") == std::string::npos)
-            sendEveryone(user_answer, FIND_CHANNEL(channel_name));
+            sendEveryoneInChan(user_answer, FIND_CHANNEL(channel_name));
         if (FIND_CHANNEL(channel_name)->getTopic() == "")
             sendMessage(send_rpl_err(331, serv, FIND_USER(sd), channel_name, ""), sd);
         else

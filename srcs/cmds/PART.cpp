@@ -4,8 +4,13 @@ void    part(Server *serv, char *buffer, int sd)
 {
     int i = 0;
     std::string buf(buffer);
-    for (; buf[5 + i] && buf[5 + i] != ' ' && buf[5 + i] != '\r' && buf[5 + i] != '\n'; i++);
+    for (; buf[5 + i] && sep.find(buf[5 + i]) == std::string::npos; i++);
     std::string channels_name(buf.substr(5, i));
+    if (channels_name.empty())
+    {
+        sendMessage(send_rpl_err(461, serv, FIND_USER(sd), "PART", ""), sd);
+        return;
+    }
     int nb_of_channels = 1 + std::count(channels_name.begin(), channels_name.end(), ',');
     for (int i = 0; i < nb_of_channels; i++)
     {
@@ -20,7 +25,7 @@ void    part(Server *serv, char *buffer, int sd)
             std::string user_answer = user_output(FIND_USER(sd));
             user_answer += buffer;
             if (FIND_CHANNEL(channel_name)->getMode().find("a") == std::string::npos)
-                sendEveryone(user_answer, FIND_CHANNEL(channel_name));
+                sendEveryoneInChan(user_answer, FIND_CHANNEL(channel_name));
             else
                 sendMessage(user_answer, sd);
             FIND_CHANNEL(channel_name)->leftUser(sd);
