@@ -15,6 +15,7 @@ SRCS =	srcs/main.cpp\
 		srcs/cmds/TOPIC.cpp\
 		srcs/cmds/KICK.cpp\
 		srcs/cmds/KILL.cpp\
+		srcs/camd/QUIT.cpp\
 		srcs/cmds/OPER.cpp\
 		srcs/cmds/MODE.cpp
 
