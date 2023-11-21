@@ -16,11 +16,12 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+
 #include "User.hpp"
 #include "Command.hpp"
 #include "Channel.hpp"
 #include "Server.hpp"
-#include "Replies.hpp"
+#include "RPL_ERR.hpp"
 
 # define SERVER_NAME "localhost"
 # define ver "1.0"
@@ -33,6 +34,12 @@
 
 # define FIND_CHANNEL(channel_name) \
     serv->getChannels().find(channel_name)->second
+
+#define CHECKUSERMODE(sd, mode) \
+    FIND_USER(sd)->getMode().find(mode) == std::string::npos ? true : false
+
+#define CHECKCHANNELMODE(channel_name, mode) \
+    FIND_CHANNEL(channel_name)->getMode().find(mode) == std::string::npos ? true : false
 
 #define max_clients 10
 

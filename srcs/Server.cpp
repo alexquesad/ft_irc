@@ -145,13 +145,12 @@ void Server::new_connection(void)
 void    handler(int signum)
 {
 	(void)signum;
-	std::cout << "MDRRR" << std::endl;
+	std::cout << "sig received." << std::endl;
 	isAlive = false;
 }
 
 void Server::connectToServer()
 {
-	std::cout << "test" << std::endl;
 	this->_sockserver = newSocket();
 	fd_set readfds;
 	int sd, activity, max_sd;
@@ -217,13 +216,21 @@ void Server::connectToServer()
 		}
 	}
 	clearAll();
+	for (int i = 0; i < max_clients; i++)
+	{
+		if (client_socket[i] != 0)
+		{
+			close(client_socket[i]);
+			client_socket[i] = 0;
+		}
+	}
 	close(this->_sockserver);
-	// if (this->_isRestart == true)
-	// {
-	// 	this->_isRestart = false;
-	// 	std::cout << "SERVER RESTARTING..." << std::endl;
-	// 	connectToServer();
-	// }
+	if (this->_isRestart == true && isAlive == true)
+	{
+		this->_isRestart = false;
+		std::cout << "SERVER RESTARTING..." << std::endl;
+		connectToServer();
+	}
 
 }
 

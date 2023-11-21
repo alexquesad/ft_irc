@@ -17,5 +17,6 @@ void mode(Server *serv, char *buffer, int sd);
 void oper(Server *serv, char *buffer, int sd);
 void kill(Server *serv, char *buffer, int sd);
 void quit(Server *serv, char *buffer, int sd);
+void restart(Server *serv, char *buffer, int sd);
 
 #endif
