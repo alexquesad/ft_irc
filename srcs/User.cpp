@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-User::User(std::string nickname, std::string username, std::string hostname, std::string real_name) : _nickname(nickname), _username(username), _hostname(hostname), _real_name(real_name){
+User::User(std::string nickname, std::string username, std::string hostname, std::string realName) : _nickname(nickname), _username(username), _hostname(hostname), _realName(realName){
 }
 
 User::~User()
@@ -23,9 +23,9 @@ std::string User::getHostname() const
     return this->_hostname;
 }
 
-std::string User::getReal_name() const
+std::string User::getRealName() const
 {
-    return this->_real_name;
+    return this->_realName;
 }
 
 std::set<std::string> & User::getChannels()
@@ -48,7 +48,7 @@ void User::setMode(std::string mode)
     this->_mode = mode;
 }
 
-void User::add_channel(std::string channel_name)
+void User::addChannel(std::string channel_name)
 {
     if (this->_channels.find(channel_name) == this->_channels.end())
         this->_channels.insert(channel_name);

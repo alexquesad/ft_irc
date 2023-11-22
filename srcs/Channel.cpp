@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-Channel::Channel(std::string channel_name) : _channel_name(channel_name), _topic("") {
+Channel::Channel(std::string channelName) : _channelName(channelName), _topic("") {
 }
 
 Channel::~Channel()
@@ -11,7 +11,7 @@ Channel::~Channel()
 	this->_banList.clear();
 }
 
-int Channel::getUsersnumber() const
+int Channel::getUsersNumber() const
 {
     return (this->_users.size() + this->_chanops.size() + this->_voices.size());
 }
@@ -21,9 +21,9 @@ std::string Channel::getTopic() const
     return this->_topic;
 }
 
-std::string Channel::getChannelname() const
+std::string Channel::getChannelName() const
 {
-    return this->_channel_name;
+    return this->_channelName;
 }
 
 std::map<int, User*> & Channel::getUsers()
@@ -127,7 +127,7 @@ int Channel::searchUserByNickname(std::string nickname)
     return (-1);
 }
 
-std::string Channel::get_list_of_user_in_chan()
+std::string Channel::getListOfUserInChan()
 {
     std::string output;
     for (std::map<int, User *>::iterator it = this->_chanops.begin(); it != this->_chanops.end(); it++)
@@ -153,7 +153,7 @@ std::string Channel::get_list_of_user_in_chan()
     return (output);
 }
 
-std::string Channel::get_list_of_user_ban()
+std::string Channel::getListOfUserBan()
 {
     std::string output;
     for (std::map<std::string, std::string>::iterator it = this->_banList.begin(); it != this->_banList.end(); it++)

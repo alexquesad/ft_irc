@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-void    part(Server *serv, char *buffer, int sd)
+void    part(Server *serv, std::string buffer, int sd)
 {
     int i = 0;
     std::string buf(buffer);
@@ -22,7 +22,7 @@ void    part(Server *serv, char *buffer, int sd)
             sendMessage(send_rpl_err(442, serv, FIND_USER(sd), channel_name, ""), sd);
         else
         {
-            std::string user_answer = user_output(FIND_USER(sd));
+            std::string user_answer = userOutput(FIND_USER(sd));
             user_answer += buffer;
             if (FIND_CHANNEL(channel_name)->getMode().find("a") == std::string::npos)
                 sendEveryoneInChan(user_answer, FIND_CHANNEL(channel_name));

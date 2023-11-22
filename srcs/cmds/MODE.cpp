@@ -10,7 +10,7 @@ void mode_o(Server *serv, Channel *channel, std::string mode, std::string buffer
     int userSd = channel->searchUserByNickname(name);
     if (userSd == -1)
     {
-        sendMessage(send_rpl_err(441, serv, FIND_USER(sd), name, channel->getChannelname()), sd);
+        sendMessage(send_rpl_err(441, serv, FIND_USER(sd), name, channel->getChannelName()), sd);
         return ;
     }
     channel->leftUser(userSd);
@@ -18,7 +18,7 @@ void mode_o(Server *serv, Channel *channel, std::string mode, std::string buffer
         channel->addUser(userSd, FIND_USER(userSd));
     else
         channel->addChanops(userSd, FIND_USER(userSd));
-    std::string user_answer = user_output(FIND_USER(sd));
+    std::string user_answer = userOutput(FIND_USER(sd));
     user_answer += buffer;
     sendEveryoneInChan(user_answer, channel);
 }
@@ -33,7 +33,7 @@ void mode_v(Server *serv, Channel *channel, std::string mode, std::string buffer
     int userSd = channel->searchUserByNickname(name);
     if (userSd == -1)
     {
-        sendMessage(send_rpl_err(441, serv, FIND_USER(sd), name, channel->getChannelname()), sd);
+        sendMessage(send_rpl_err(441, serv, FIND_USER(sd), name, channel->getChannelName()), sd);
         return ;
     }
     if (channel->isChanop(userSd) == true)
@@ -43,7 +43,7 @@ void mode_v(Server *serv, Channel *channel, std::string mode, std::string buffer
         channel->addUser(userSd, FIND_USER(userSd));
     else
         channel->addVoices(userSd, FIND_USER(userSd));
-    std::string user_answer = user_output(FIND_USER(sd));
+    std::string user_answer = userOutput(FIND_USER(sd));
     user_answer += buffer;
     sendEveryoneInChan(user_answer, channel);
 }
@@ -58,13 +58,13 @@ void mode_b(Server *serv, Channel *channel, std::string mode, std::string buffer
     std::string name = buffer.substr(i, buffer.find('\r') != std::string::npos ? buffer.length() - 2 - i : buffer.length() - 1 - i);
     if (name.empty())
     {
-        std::string banlist = channel->get_list_of_user_ban();
+        std::string banlist = channel->getListOfUserBan();
         if (!banlist.empty())
         {
             banlist.erase(banlist.length() - 1, 1);
-            sendMessage(send_rpl_err(367, serv, FIND_USER(sd), channel->getChannelname(), banlist), sd);
+            sendMessage(send_rpl_err(367, serv, FIND_USER(sd), channel->getChannelName(), banlist), sd);
         }
-        sendMessage(send_rpl_err(368, serv, FIND_USER(sd), channel->getChannelname(), ""), sd);
+        sendMessage(send_rpl_err(368, serv, FIND_USER(sd), channel->getChannelName(), ""), sd);
     }
 	else
     {
@@ -149,7 +149,7 @@ bool availableMode(char c, std::string availableMode)
     return (!(availableMode.find(c) == std::string::npos));
 }
 
-void channelMode(Server *serv, Channel *channel, std::string mode, int sd, char *buffer)
+void channelMode(Server *serv, Channel *channel, std::string mode, int sd, std::string buffer)
 {
     std::string channelMode = channel->getMode();
     int i;
@@ -171,7 +171,7 @@ void channelMode(Server *serv, Channel *channel, std::string mode, int sd, char 
             if (availableMode(mode[i], CHANNEL_MODE) == false)
 	        {
 		        std::string stringMode(1, mode[i]);
-                sendMessage(send_rpl_err(472, serv, FIND_USER(sd), stringMode, channel->getChannelname()), sd);
+                sendMessage(send_rpl_err(472, serv, FIND_USER(sd), stringMode, channel->getChannelName()), sd);
 	        }
             else if (availableMode(mode[i], "ovbkl") == true)
 	        {
@@ -186,11 +186,11 @@ void channelMode(Server *serv, Channel *channel, std::string mode, int sd, char 
             }
         }
         channel->setMode(channelMode);
-        std::string user_answer = user_output(FIND_USER(sd));
+        std::string user_answer = userOutput(FIND_USER(sd));
         if (channel->getMode().find("a") != std::string::npos)
-            user_answer = anonymous_output();
+            user_answer = anonymousOutput();
         if (!deletedMode.empty())
-            user_answer += "MODE " + channel->getChannelname() + " -" + deletedMode;
+            user_answer += "MODE " + channel->getChannelName() + " -" + deletedMode;
         sendEveryoneInChan(user_answer, channel);
     }
     else
@@ -201,7 +201,7 @@ void channelMode(Server *serv, Channel *channel, std::string mode, int sd, char 
             if (availableMode(mode[i], CHANNEL_MODE) == false)
             {
                 std::string stringMode(1, mode[i]);
-                sendMessage(send_rpl_err(472, serv, FIND_USER(sd), stringMode, channel->getChannelname()), sd);
+                sendMessage(send_rpl_err(472, serv, FIND_USER(sd), stringMode, channel->getChannelName()), sd);
             }
             else if (availableMode(mode[i], "ovbkl") == true)
             {
@@ -213,11 +213,11 @@ void channelMode(Server *serv, Channel *channel, std::string mode, int sd, char 
                 addedMode += mode[i];
         }
         channel->setMode(channelMode + addedMode);
-        std::string user_answer = user_output(FIND_USER(sd));
+        std::string user_answer = userOutput(FIND_USER(sd));
         if (channel->getMode().find("a") != std::string::npos)
-            user_answer = anonymous_output();
+            user_answer = anonymousOutput();
         if (!addedMode.empty())
-            user_answer += "MODE " + channel->getChannelname() + " +" + addedMode;
+            user_answer += "MODE " + channel->getChannelName() + " +" + addedMode;
         sendEveryoneInChan(user_answer, channel);
     }
 }
@@ -249,7 +249,7 @@ void userMode(Server *serv, User *user, std::string mode, int sd)
             }
         }
         user->setMode(userMode);
-        std::string user_answer = user_output(FIND_USER(userSd));
+        std::string user_answer = userOutput(FIND_USER(userSd));
         if (!deletedMode.empty())
             user_answer += "MODE " + user->getNickname() + " -" + deletedMode;
         sendMessage(user_answer, userSd);
@@ -274,14 +274,14 @@ void userMode(Server *serv, User *user, std::string mode, int sd)
             }
         }
         user->setMode(userMode + addedMode);
-        std::string user_answer = user_output(FIND_USER(userSd));
+        std::string user_answer = userOutput(FIND_USER(userSd));
         if (!addedMode.empty())
             user_answer += "MODE " + user->getNickname() + " +" + addedMode;
         sendMessage(user_answer, userSd);
     }
 }
 
-void mode(Server *serv, char *buffer, int sd)
+void mode(Server *serv, std::string buffer, int sd)
 {
     int i = 0;
     std::string buf(buffer);

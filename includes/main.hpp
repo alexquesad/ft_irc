@@ -1,5 +1,4 @@
-#ifndef MAIN_HPP
-# define MAIN_HPP
+#pragma once
 
 #include <iostream>
 #include <map>
@@ -21,18 +20,18 @@
 #include "Command.hpp"
 #include "Channel.hpp"
 #include "Server.hpp"
-#include "RPL_ERR.hpp"
+#include "Replies.hpp"
 
-# define SERVER_NAME "localhost"
-# define ver "1.0"
-# define USER_MODE "ior"
-# define CHANNEL_MODE "ovamntlkb"
-# define OPER_PW "5498"
+#define SERVER_NAME "localhost"
+#define ver "1.0"
+#define USER_MODE "ior"
+#define CHANNEL_MODE "ovamntlkb"
+#define OPER_PW "1234"
 
-# define FIND_USER(sd) \
+#define FIND_USER(sd) \
     serv->getUsers().find(sd)->second
 
-# define FIND_CHANNEL(channel_name) \
+#define FIND_CHANNEL(channel_name) \
     serv->getChannels().find(channel_name)->second
 
 #define CHECKUSERMODE(sd, mode) \
@@ -50,13 +49,11 @@ class Server;
 class User;
 class Channel;
 
-std::string user_output(User *user);
-std::string anonymous_output();
+std::string userOutput(User *user);
+std::string anonymousOutput();
 void disconnectUser(Server *serv, int sd);
 void sendMessage(std::string message, int sd);
 void sendEveryoneInChan(std::string message, Channel *chan);
 void sendEveryoneInChanExceptUser(std::string message, Channel *chan, int sd);
 void sendEveryone(std::string message, std::map<int, User *> users);
-bool nickname_is_in_use(Server *serv, std::string nick);
-
-#endif
+bool nicknameIsInUse(Server *serv, std::string nick);

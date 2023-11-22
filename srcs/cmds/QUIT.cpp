@@ -5,7 +5,7 @@ extern int client_socket[max_clients];
 void disconnectUser(Server* serv, int sd)
 {
     std::set<std::string> userChannels = FIND_USER(sd)->getChannels();
-    std::string userAnswer = user_output(FIND_USER(sd));
+    std::string userAnswer = userOutput(FIND_USER(sd));
     // erase user from each channel;
     for (std::set<std::string>::iterator it = userChannels.begin(); it != userChannels.end(); it++)
     {
@@ -28,7 +28,7 @@ void disconnectUser(Server* serv, int sd)
     close(sd);
 }
 
-void quit(Server *serv, char *buffer, int sd)
+void quit(Server *serv, std::string buffer, int sd)
 {
     std::string buf(buffer);
     std::cout << "enter" << std::endl;
@@ -38,9 +38,9 @@ void quit(Server *serv, char *buffer, int sd)
     std::cout << "message : " << message << std::endl;
     std::string userAnswer;
     if (!message.empty())
-        userAnswer = user_output(FIND_USER(sd)) + buffer;
+        userAnswer = userOutput(FIND_USER(sd)) + buffer;
     else
-        userAnswer = user_output(FIND_USER(sd)) + "QUIT :leaving";
+        userAnswer = userOutput(FIND_USER(sd)) + "QUIT :leaving";
     disconnectUser(serv, sd);
     sendEveryone(userAnswer, serv->getUsers());
 }

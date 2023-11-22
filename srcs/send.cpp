@@ -36,12 +36,12 @@ void sendEveryone(std::string message, std::map<int, User *> users)
         sendMessage(message, it->first);
 }
 
-std::string user_output(User *user)
+std::string userOutput(User *user)
 {
     return (":" + user->getNickname() + "!" + user->getUsername() + "@" + user->getHostname() + " ");
 }
 
-std::string anonymous_output()
+std::string anonymousOutput()
 {
     return (":anonymous!anonymous@anonymous ");
 }

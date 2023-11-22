@@ -30,7 +30,7 @@ bool nickname_is_in_use(Server *serv, std::string nick)
     return (false);
 }
 
-void nick(Server *serv, char *buffer, int sd)
+void nick(Server *serv, std::string buffer, int sd)
 {
     int i = 0;
     std::string buf(buffer);
@@ -56,7 +56,7 @@ void nick(Server *serv, char *buffer, int sd)
         sendMessage(send_rpl_err(433, serv, FIND_USER(sd), new_nickname, ""), sd);
         return ;
     }
-    std::string user_answer = user_output(FIND_USER(sd));
+    std::string user_answer = userOutput(FIND_USER(sd));
     user_answer += buffer;
     sendMessage(user_answer, sd);
     FIND_USER(sd)->setNick(new_nickname);

@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-void topic(Server *serv, char *buffer, int sd)
+void topic(Server *serv, std::string buffer, int sd)
 {
     int i = 0;
     std::string buf(buffer);
@@ -24,9 +24,9 @@ void topic(Server *serv, char *buffer, int sd)
         topic = topic.substr(0, topic.find('\r') != std::string::npos ? topic.length() - 2 : topic.length() - 1);
         FIND_CHANNEL(channel_name)->setTopic(topic);
         sendMessage(send_rpl_err(332, serv, FIND_USER(sd), channel_name, FIND_CHANNEL(channel_name)->getTopic()), sd);
-        std::string user_answer = user_output(FIND_USER(sd));
+        std::string user_answer = userOutput(FIND_USER(sd));
         if (FIND_CHANNEL(channel_name)->getMode().find("a") != std::string::npos)
-            user_answer = anonymous_output();
+            user_answer = anonymousOutput();
         user_answer += buffer;
         sendEveryoneInChan(user_answer, FIND_CHANNEL(channel_name));
     }

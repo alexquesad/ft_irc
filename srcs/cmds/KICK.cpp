@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-void kick(Server *serv, char *buffer, int sd)
+void kick(Server *serv, std::string buffer, int sd)
 {
     std::string buf(buffer);
     int kickCount = std::count(buf.begin(), buf.end(), '\n');
@@ -67,7 +67,7 @@ void kick(Server *serv, char *buffer, int sd)
                     sendMessage(send_rpl_err(441, serv, FIND_USER(sd), user_nick, channel_name), sd);
                     continue;
                 }
-                std::string user_answer = user_output(FIND_USER(sd));
+                std::string user_answer = userOutput(FIND_USER(sd));
                 user_answer += buffer;
                 sendEveryoneInChanExceptUser(user_answer, FIND_CHANNEL(channel_name), userToKickSd);
                 FIND_CHANNEL(channel_name)->leftUser(userToKickSd);
@@ -77,7 +77,7 @@ void kick(Server *serv, char *buffer, int sd)
                     serv->getChannels().erase(channel_name);
                 }
                 FIND_USER(userToKickSd)->getChannels().erase(channel_name);
-                user_answer = user_output(FIND_USER(userToKickSd));
+                user_answer = userOutput(FIND_USER(userToKickSd));
                 user_answer += "PART " + channel_name;
                 sendMessage(user_answer, userToKickSd);
             }

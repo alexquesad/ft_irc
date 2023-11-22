@@ -3,7 +3,7 @@
 int client_socket[max_clients];
 bool isAlive = true;
 
-Server::Server(const std::string &port, const std::string &password) : _port(port), _password(password), _server_name(), _isRestart(false){
+Server::Server(const std::string &port, const std::string &password) : _port(port), _password(password), _serverName(), _isRestart(false){
 	this->_commandhandler.insert(std::pair<std::string, command>("NICK", &nick));
 	this->_commandhandler.insert(std::pair<std::string, command>("JOIN", &join));
 	this->_commandhandler.insert(std::pair<std::string, command>("PRIVMSG", &privmsg));
@@ -34,26 +34,26 @@ int Server::newSocket()
 		throw std::runtime_error("Error while setting up socket.\n");
 	if (fcntl(sock, F_SETFL, O_NONBLOCK) == -1)
 		throw std::runtime_error("Error while setting socket NON-BLOCKING mode.\n");
-	server.sin_addr.s_addr = INADDR_ANY;
-	server.sin_port = htons(static_cast<unsigned short>(std::strtoul(this->_port.c_str(), NULL, 0)));
-	server.sin_family = AF_INET;
-	if (bind(sock, (const struct sockaddr*)&server, sizeof(server)) < 0)
+	_server.sin_addr.s_addr = INADDR_ANY;
+	_server.sin_port = htons(static_cast<unsigned short>(std::strtoul(this->_port.c_str(), NULL, 0)));
+	_server.sin_family = AF_INET;
+	if (bind(sock, (const struct sockaddr*)&_server, sizeof(_server)) < 0)
 		throw std::runtime_error("Error binding socket.\n");
 	if (listen(sock, 10) < 0)
 		throw std::runtime_error("Error listening on socket.\n");
 	return sock;
 }
 
-void Server::new_connection(void)
+void Server::newConnection(void)
 {
-	socklen_t csize = sizeof(server);
-	if ((this->_sockcom = accept(this->_sockserver, (struct sockaddr *)&server, &csize)) < 0)
+	socklen_t csize = sizeof(_server);
+	if ((this->_sockcom = accept(this->_sockserver, (struct sockaddr *)&_server, &csize)) < 0)
 	{
 		perror("accept");
 		exit(EXIT_FAILURE);
 	}
 	//inform user of socket number - used in send and receive commands
-	std::cout << "New connection , socket fd is " << this->_sockcom << " , ip is : " << inet_ntoa(server.sin_addr) << " , port : " <<  ntohs(server.sin_port) << std::endl;
+	std::cout << "New connection , socket fd is " << this->_sockcom << " , ip is : " << inet_ntoa(_server.sin_addr) << " , port : " <<  ntohs(_server.sin_port) << std::endl;
 	std::string ret;
 	//send new connection greeting message
 	size_t occ;
@@ -92,7 +92,7 @@ void Server::new_connection(void)
 			//nickname
 			for (int i = 0;ret[occ + 5 + i] && sep.find(ret[occ + 5 + i]) == std::string::npos; i++)
 				nick += ret[occ + 5 + i];
-			if (nickname_is_in_use(this, nick))
+			if (nicknameIsInUse(this, nick))
 			{
 				sendMessage(send_rpl_err(433, this, NULL, nick, ""), this->_sockcom);
 				is_nick_good = false;
@@ -118,7 +118,7 @@ void Server::new_connection(void)
 	} while (ret.find("USER") == std::string::npos);
 	if (is_pass_good == true && _users.size() < 10 && is_nick_good == true)
 	{
-		this->_server_name = server_name;
+		this->_serverName = server_name;
 		User *new_user = new User(nick, user, host, real_name);
 		this->setUsers(this->_sockcom, new_user);
 		std::cout << "number of user connected to the server: " << this->_users.size() << std::endl;
@@ -187,7 +187,7 @@ void Server::connectToServer()
             std::cerr << ("select error") << std::endl;
 		//connect new user
 		if (FD_ISSET(this->_sockserver, &readfds))
-            new_connection();
+            newConnection();
 		else
 		{
 			for (int i = 0; i < max_clients; i++)
@@ -203,12 +203,14 @@ void Server::connectToServer()
 					{
 						std::cout << "\033[1;34mRECV RETOUR :\033[0m " << buffer << "]";
 						std::string command(buffer);
+						std::string buf(buffer);
 						int occ = 0;
 						for (; command[occ] && sep.find(command[occ]) == std::string::npos; occ++);
 						command = command.substr(0, occ);
 						std::cout << command << "]" << std::endl;
 						if (_commandhandler.find(command) != _commandhandler.end())
-							(_commandhandler[command])(this, buffer, sd);
+							// (_commandhandler[command])(this, buffer, sd);
+							(_commandhandler[command])(this, buf, sd);
 						break;
 					}
 				}
@@ -245,9 +247,9 @@ std::string Server::receiveMessage() const
 	return message;
 }
 
-std::string Server::getServername() const
+std::string Server::getServerName() const
 {
-	return this->_server_name;
+	return this->_serverName;
 }
 
 std::string Server::getPort() const
@@ -267,7 +269,7 @@ std::map<int, User*> & Server::getUsers()
 
 struct sockaddr_in Server::getServer()
 {
-	return this->server;
+	return this->_server;
 }
 
 void Server::setChannels(std::string channel_name, Channel *chan)

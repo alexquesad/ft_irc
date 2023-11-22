@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-void privmsg(Server *serv, char *buffer, int sd)
+void privmsg(Server *serv, std::string buffer, int sd)
 {
     int i = 0;
     int occAfterCmd;
@@ -15,7 +15,7 @@ void privmsg(Server *serv, char *buffer, int sd)
 
     int userToSendSd;
     std::string user_answer;
-    user_answer = user_output(FIND_USER(sd));
+    user_answer = userOutput(FIND_USER(sd));
     user_answer += buffer;
     if (!msgtarget.empty() && idOfChannel.find(msgtarget[0]) != std::string::npos)
     {
@@ -29,7 +29,7 @@ void privmsg(Server *serv, char *buffer, int sd)
             sendMessage(send_rpl_err(404, serv, FIND_USER(sd), msgtarget, ""), sd);
         if ((FIND_CHANNEL(msgtarget)->getMode().find("a") != std::string::npos))
         {
-            user_answer = anonymous_output() + buffer;
+            user_answer = anonymousOutput() + buffer;
             sendEveryoneInChanExceptUser(user_answer, FIND_CHANNEL(msgtarget), sd);
         }
         else

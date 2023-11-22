@@ -13,9 +13,9 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
     std::string ret;
 
     if (user)
-        ret += ":" + serv->getServername() + " " + codestr + " " + user->getNickname() + " ";
+        ret += ":" + serv->getServerName() + " " + codestr + " " + user->getNickname() + " ";
     else
-        ret += ":" + serv->getServername() + " " + codestr + " " + "*" + " ";
+        ret += ":" + serv->getServerName() + " " + codestr + " " + "*" + " ";
     switch (code)
     {
         case 001:

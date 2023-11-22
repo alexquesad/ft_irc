@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-void kill(Server *serv, char *buffer, int sd)
+void kill(Server *serv, std::string buffer, int sd)
 {
     std::string buf(buffer);
     std::string name;

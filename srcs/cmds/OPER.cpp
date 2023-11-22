@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-void oper(Server *serv, char *buffer, int sd)
+void oper(Server *serv, std::string buffer, int sd)
 {
     std::string buf(buffer);
     std::string password;
@@ -32,7 +32,7 @@ void oper(Server *serv, char *buffer, int sd)
     }
     if (password.compare(OPER_PW) == 0)
     {
-        std:: string user_answer = user_output(FIND_USER(serv->searchUserByNickname(user)));
+        std:: string user_answer = userOutput(FIND_USER(serv->searchUserByNickname(user)));
         user_answer += "MODE " + FIND_USER(serv->searchUserByNickname(user))->getNickname() + " +o";
         FIND_USER(serv->searchUserByNickname(user))->setMode(FIND_USER(serv->searchUserByNickname(user))->getMode() + "o");
         sendMessage(user_answer, serv->searchUserByNickname(user));

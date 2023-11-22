@@ -22,7 +22,7 @@ bool channelNameInvalid(std::string name)
     return (it == name.end());
 }
 
-void join(Server *serv, char *buffer, int sd)
+void join(Server *serv, std::string buffer, int sd)
 {
     int i = 0, j = 0;
     std::string buf(buffer);
@@ -101,7 +101,7 @@ void join(Server *serv, char *buffer, int sd)
         else
             FIND_CHANNEL(channel_name)->addUser(sd, FIND_USER(sd));
         FIND_USER(sd)->add_channel(channel_name);
-        std::string user_answer = user_output(FIND_USER(sd));
+        std::string user_answer = userOutput(FIND_USER(sd));
         user_answer += buffer;
         if (FIND_CHANNEL(channel_name)->getMode().find("a") == std::string::npos)
             sendEveryoneInChan(user_answer, FIND_CHANNEL(channel_name));
