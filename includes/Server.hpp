@@ -21,7 +21,6 @@ class Server{
 		bool _isRestart;
 		int newSocket();
 		void newConnection(void);
-		// void handler(int signum);
 
 	public:
 		Server(const std::string &port, const std::string &password);
@@ -36,7 +35,6 @@ class Server{
 		void setChannels(std::string channel_name, Channel *chan);
 		void setUsers(int sd, User *user);
 		void setIsRestart();
-		void setIsAlive();
 		int searchUserByNickname(std::string nickname);
 		void clearAll();
 };

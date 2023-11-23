@@ -12,7 +12,7 @@ void disconnectUser(Server* serv, int sd)
         userAnswer += "PART " + *it;
         sendEveryoneInChan(userAnswer, FIND_CHANNEL(*it));
         FIND_CHANNEL(*it)->leftUser(sd);
-        if (FIND_CHANNEL(*it)->getUsersnumber() == 0)
+        if (FIND_CHANNEL(*it)->getUsersNumber() == 0)
         {
             delete serv->getChannels().find(*it)->second;
             serv->getChannels().erase(*it);
@@ -31,11 +31,9 @@ void disconnectUser(Server* serv, int sd)
 void quit(Server *serv, std::string buffer, int sd)
 {
     std::string buf(buffer);
-    std::cout << "enter" << std::endl;
     int i = 0;
     for (;buf[i + 5] && sep.find(buf[i + 5]) == std::string::npos; i++);
     std::string message = buf.substr(5, i);
-    std::cout << "message : " << message << std::endl;
     std::string userAnswer;
     if (!message.empty())
         userAnswer = userOutput(FIND_USER(sd)) + buffer;

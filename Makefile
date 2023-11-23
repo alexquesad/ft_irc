@@ -17,7 +17,7 @@ SRCS =	srcs/main.cpp\
 		srcs/cmds/QUIT.cpp\
 		srcs/cmds/OPER.cpp\
 		srcs/cmds/MODE.cpp\
-		srcd/cmds/RESTART.cpp
+		srcs/cmds/RESTART.cpp
 
 CXX = c++
 

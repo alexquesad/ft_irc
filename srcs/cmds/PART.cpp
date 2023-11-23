@@ -29,7 +29,7 @@ void    part(Server *serv, std::string buffer, int sd)
             else
                 sendMessage(user_answer, sd);
             FIND_CHANNEL(channel_name)->leftUser(sd);
-            if (FIND_CHANNEL(channel_name)->getUsersnumber() == 0)
+            if (FIND_CHANNEL(channel_name)->getUsersNumber() == 0)
             {
                 delete serv->getChannels().find(channel_name)->second;
                 serv->getChannels().erase(channel_name);

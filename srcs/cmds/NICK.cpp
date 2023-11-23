@@ -20,7 +20,7 @@ bool nickname_is_valid(std::string nick)
     return (true);
 }
 
-bool nickname_is_in_use(Server *serv, std::string nick)
+bool nicknameIsInUse(Server *serv, std::string nick)
 {
     for (std::map<int, User *>::iterator it = serv->getUsers().begin(); it != serv->getUsers().end(); it++)
     {
@@ -51,7 +51,7 @@ void nick(Server *serv, std::string buffer, int sd)
         sendMessage(send_rpl_err(432, serv, FIND_USER(sd), new_nickname, ""), sd);
         return ;
     }
-    if (nickname_is_in_use(serv, new_nickname))
+    if (nicknameIsInUse(serv, new_nickname))
     {
         sendMessage(send_rpl_err(433, serv, FIND_USER(sd), new_nickname, ""), sd);
         return ;

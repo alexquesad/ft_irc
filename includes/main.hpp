@@ -57,3 +57,4 @@ void sendEveryoneInChan(std::string message, Channel *chan);
 void sendEveryoneInChanExceptUser(std::string message, Channel *chan, int sd);
 void sendEveryone(std::string message, std::map<int, User *> users);
 bool nicknameIsInUse(Server *serv, std::string nick);
+bool nickname_is_valid(std::string nick);
