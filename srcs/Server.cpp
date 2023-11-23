@@ -215,9 +215,7 @@ void Server::connectToServer()
 	fd_set readfds;
 	int sd, activity, max_sd;
 	for (int i = 0; i < max_clients; i++)
-    {
         client_socket[i] = 0;
-    }
 	std::cout << "listening..." << std::endl;
 	while (this->_isRestart == false && isAlive == true)
 	{
@@ -229,15 +227,15 @@ void Server::connectToServer()
         FD_SET(this->_sockserver, &readfds);
         max_sd = this->_sockserver;
         //add child sockets to set
-        for ( int i = 0 ; i < max_clients ; i++)
+        for (int i = 0; i < max_clients; i++)
         {
             //socket descriptor
             sd = client_socket[i];
             //if valid socket descriptor then add to read list
-            if(sd > 0)
+            if (sd > 0)
                 FD_SET( sd , &readfds);
             //highest file descriptor number, need it for the select function
-            if(sd > max_sd)
+            if (sd > max_sd)
                 max_sd = sd;
         }
         //wait for an activity on one of the sockets , timeout is NULL ,
@@ -255,24 +253,20 @@ void Server::connectToServer()
 				sd = client_socket[i];
 				if (FD_ISSET( sd , &readfds))
 				{
-					char buffer[1025];
-					memset(buffer, 0, 1025);
+					std::string buf;
 					//Check if it was for closing , and also read the
 					//incoming message
-					if (recv( sd , buffer, 1024, 0) > 0)
-					{
-						std::cout << "\033[1;34mRECV RETOUR :\033[0m " << buffer << "]";
-						std::string command(buffer);
-						std::string buf(buffer);
-						int occ = 0;
-						for (; command[occ] && sep.find(command[occ]) == std::string::npos; occ++);
-						command = command.substr(0, occ);
-						std::cout << command << "]" << std::endl;
-						if (_commandhandler.find(command) != _commandhandler.end())
-							// (_commandhandler[command])(this, buffer, sd);
-							(_commandhandler[command])(this, buf, sd);
-						break;
-					}
+					buf = receiveMessage();
+					std::cout << "\033[1;34mRECV RETOUR :\033[0m " << buf << "]";
+					std::string command(buf);
+					int occ = 0;
+					for (; command[occ] && sep.find(command[occ]) == std::string::npos; occ++);
+					command = command.substr(0, occ);
+					std::cout << command << "]" << std::endl;
+					if (_commandhandler.find(command) != _commandhandler.end())
+						(_commandhandler[command])(this, buf, sd);
+					break;
+					std::cout << buf << std::endl;
 				}
 			}
 		}
@@ -298,12 +292,12 @@ void Server::connectToServer()
 std::string Server::receiveMessage() const
 {
 	char buffer[1024];
-	std::string message;
+	std::string buf = "";
 	memset(buffer, 0, 1024);
-	if (recv(this->_sockcom, buffer, 1024, 0) < 0)
-		throw std::runtime_error("Error receiving message");
-	message = buffer;
-	return message;
+	while ((buf += buffer).find('\n') == std::string::npos && isAlive == true)
+		if (recv(this->_sockcom, buffer, 1024, 0) < 0)
+			throw std::runtime_error("Error receiving message");
+	return buf;
 }
 
 std::string Server::getServerName() const
