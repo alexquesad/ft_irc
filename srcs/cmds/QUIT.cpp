@@ -5,10 +5,10 @@ extern int client_socket[max_clients];
 void disconnectUser(Server* serv, int sd)
 {
     std::set<std::string> userChannels = FIND_USER(sd)->getChannels();
-    std::string userAnswer = userOutput(FIND_USER(sd));
     // erase user from each channel;
     for (std::set<std::string>::iterator it = userChannels.begin(); it != userChannels.end(); it++)
     {
+        std::string userAnswer = userOutput(FIND_USER(sd));
         userAnswer += "PART " + *it;
         sendEveryoneInChan(userAnswer, FIND_CHANNEL(*it));
         FIND_CHANNEL(*it)->leftUser(sd);

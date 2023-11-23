@@ -92,7 +92,7 @@ void join(Server *serv, std::string buffer, int sd)
             FIND_CHANNEL(channel_name)->addUser(sd, FIND_USER(sd));
         FIND_USER(sd)->addChannel(channel_name);
         std::string user_answer = userOutput(FIND_USER(sd));
-        user_answer += buffer;
+        user_answer += "JOIN " + channel_name;
         if (FIND_CHANNEL(channel_name)->getMode().find("a") == std::string::npos)
             sendEveryoneInChan(user_answer, FIND_CHANNEL(channel_name));
         if (FIND_CHANNEL(channel_name)->getTopic() == "")

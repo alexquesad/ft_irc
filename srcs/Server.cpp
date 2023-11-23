@@ -18,11 +18,14 @@ Server::Server(const std::string &port, const std::string &password) : _port(por
 	this->_commandhandler.insert(std::pair<std::string, command>("kill", &kill));
 	this->_commandhandler.insert(std::pair<std::string, command>("KILL", &kill));
 	this->_commandhandler.insert(std::pair<std::string, command>("QUIT", &quit));
-	// this->_commandhandler.insert(std::make_pair("RESTART", &restart));
-	// this->_commandhandler.insert(std::make_pair("restart", &restart));
+	this->_commandhandler.insert(std::pair<std::string, command>("RESTART", &restart));
+	this->_commandhandler.insert(std::pair<std::string, command>("restart", &restart));
 }
 
-Server::~Server(){close(this->_sockserver);}
+Server::~Server()
+{
+	this->_commandhandler.clear();
+}
 
 int Server::newSocket()
 {
@@ -61,106 +64,117 @@ void Server::newConnection(void)
 	bool is_pass_good = false, is_nick_good = false, is_user_good = false;
 	bool is_nick_available = true, is_user_full = true;
 	std::string nick, user, host, server_name, real_name, pass, buffer;
-	// while (is_pass_good == false)
-	// {
+
+	ret = this->receiveMessage();
+	std::cout << "{" << ret << "}" << std::endl;
+	if (((ret.find("CAP LS") != std::string::npos && ret.find("PASS ") == std::string::npos) || (ret.find("CAP LS") != std::string::npos && ret.find("PASS ") == std::string::npos && ret.find("NICK ") != std::string::npos)) && ret.find("USER ") == std::string::npos)
 		ret = this->receiveMessage();
-		if ((occ = ret.find("PASS ")) != std::string::npos)
-		{
-			if ((firstOcc = ret.find_first_not_of(' ', occ + 5)) == std::string::npos)
-			{
-				sendMessage(send_rpl_err(461, this, NULL, "PASS", ""), this->_sockcom);
-				close(this->_sockcom);
-			}
-			else
-			{
-				for (int i = 0;ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
-					pass += ret[firstOcc + i];
-				if (pass.empty())
-				{
-					sendMessage(send_rpl_err(461, this, NULL, "PASS", ""), this->_sockcom);
-					close(this->_sockcom);
-				}
-				else if (pass.compare(this->_password) != 0)
-				{
-					sendMessage("WRONG PASSWORD", this->_sockcom);
-					close(this->_sockcom);
-				}
-				else
-					is_pass_good = true;
-			}
-		}
-		else
-			sendMessage("You need to enter a pass!", this->_sockcom);
-	// }
-	if (ret.find("NICK ") == std::string::npos || is_nick_available == false)
-		ret = this->receiveMessage();
-	is_nick_available = true;
-	if ((occ = ret.find("NICK ")) != std::string::npos)
+	std::cout << "[" << ret << "]" << std::endl;
+	if ((occ = ret.find("PASS ")) != std::string::npos)
 	{
-		if ((firstOcc = ret.find_first_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz[]\\`_^{|}0123456789-", occ +5)) == std::string::npos)
+		if ((firstOcc = ret.find_first_not_of(' ', occ + 5)) == std::string::npos)
 		{
-			sendMessage(send_rpl_err(432, this, NULL, nick, ""), this->_sockcom);
+			sendMessage(send_rpl_err(461, this, NULL, "PASS", ""), this->_sockcom);
 			close(this->_sockcom);
 		}
 		else
 		{
 			for (int i = 0;ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
-				nick += ret[firstOcc + i];
-			if (!nickname_is_valid(nick))
+				pass += ret[firstOcc + i];
+			if (pass.empty())
 			{
-				sendMessage(send_rpl_err(432, this, NULL, nick, ""), this->_sockcom);
-				close(this->_sockcom);	
+				sendMessage(send_rpl_err(461, this, NULL, "PASS", ""), this->_sockcom);
+				close(this->_sockcom);
 			}
-			else if (nicknameIsInUse(this, nick))
+			else if (pass.compare(this->_password) != 0)
 			{
-				sendMessage(send_rpl_err(433, this, NULL, nick, ""), this->_sockcom);
-				sendMessage("Please try reconnect with an available nickname.", this->_sockcom);
-				is_nick_available = false;
+				sendMessage("WRONG PASSWORD", this->_sockcom);
 				close(this->_sockcom);
 			}
 			else
-				is_nick_good = true;
+				is_pass_good = true;
 		}
 	}
 	else
-		sendMessage("You have to enter a nickname\nUsage: NICK [nickname]", this->_sockcom);
-	while (is_user_good == false && is_nick_good == true)
 	{
-		if (ret.find("USER ") == std::string::npos || is_user_full == false)
+		sendMessage("You need to enter a pass!", this->_sockcom);
+		close(this->_sockcom);
+	}
+	if (is_pass_good == true)
+	{
+		if (ret.find("NICK ") == std::string::npos || is_nick_available == false)
 			ret = this->receiveMessage();
-		if ((occ = ret.find("USER ")) != std::string::npos)
+		is_nick_available = true;
+		if ((occ = ret.find("NICK ")) != std::string::npos)
 		{
-			int i = 0;
-			//username
-			if ((firstOcc = ret.find_first_not_of(' ', occ + 5)) == std::string::npos)
-				sendMessage(send_rpl_err(461, this, NULL, "USER", ""), this->_sockcom);
-			for (;ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
-				user += ret[firstOcc + i];
-			//hostname
-			if ((firstOcc = ret.find_first_not_of(' ', firstOcc + i)) == std::string::npos)
-				sendMessage(send_rpl_err(461, this, NULL, "USER", ""), this->_sockcom);
-			for (i = 0;ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
-				host += ret[firstOcc + i];
-			//server_name
-			if ((firstOcc = ret.find_first_not_of(' ', firstOcc + i)) == std::string::npos)
-				sendMessage(send_rpl_err(461, this, NULL, "USER", ""), this->_sockcom);
-			for (i = 0;ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
-				server_name += ret[firstOcc + i];
-			//real_name
-			if ((firstOcc = ret.find_first_not_of(' ', firstOcc + i)) == std::string::npos)
-				sendMessage(send_rpl_err(461, this, NULL, "USER", ""), this->_sockcom);
-			for (i = 0;ret[firstOcc + i] && endBuf.find(ret[firstOcc + i]) == std::string::npos; i++)
-				real_name += ret[firstOcc + i];
-			if (!(user.empty() || host.empty() || server_name.empty() || real_name.empty()))
-				is_user_good = true;
+			if ((firstOcc = ret.find_first_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz[]\\`_^{|}0123456789-", occ +5)) == std::string::npos)
+			{
+				sendMessage(send_rpl_err(432, this, NULL, nick, ""), this->_sockcom);
+				close(this->_sockcom);
+			}
 			else
 			{
-				sendMessage("Usage: USER [username] [hostname] [server_name] [real_name]", this->_sockcom);
-				is_user_full = false;
+				for (int i = 0;ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
+					nick += ret[firstOcc + i];
+				if (!nickname_is_valid(nick))
+				{
+					sendMessage(send_rpl_err(432, this, NULL, nick, ""), this->_sockcom);
+					close(this->_sockcom);	
+				}
+				else if (nicknameIsInUse(this, nick))
+				{
+					sendMessage(send_rpl_err(433, this, NULL, nick, ""), this->_sockcom);
+					sendMessage("Please try reconnect with an available nickname.", this->_sockcom);
+					is_nick_available = false;
+					close(this->_sockcom);
+				}
+				else
+					is_nick_good = true;
 			}
 		}
 		else
-			sendMessage("You need to enter a username\nUsage: USER [username] [hostname] [server_name] [real_name]", this->_sockcom);
+		{
+			sendMessage("You have to enter a nickname\nUsage: NICK [nickname]", this->_sockcom);
+			close(this->_sockcom);
+		}
+		while (is_user_good == false && is_nick_good == true)
+		{
+			if (ret.find("USER ") == std::string::npos || is_user_full == false)
+				ret = this->receiveMessage();
+			if ((occ = ret.find("USER ")) != std::string::npos)
+			{
+				int i = 0;
+				//username
+				if ((firstOcc = ret.find_first_not_of(' ', occ + 5)) == std::string::npos)
+					sendMessage(send_rpl_err(461, this, NULL, "USER", ""), this->_sockcom);
+				for (;ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
+					user += ret[firstOcc + i];
+				//hostname
+				if ((firstOcc = ret.find_first_not_of(' ', firstOcc + i)) == std::string::npos)
+					sendMessage(send_rpl_err(461, this, NULL, "USER", ""), this->_sockcom);
+				for (i = 0;ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
+					host += ret[firstOcc + i];
+				//server_name
+				if ((firstOcc = ret.find_first_not_of(' ', firstOcc + i)) == std::string::npos)
+					sendMessage(send_rpl_err(461, this, NULL, "USER", ""), this->_sockcom);
+				for (i = 0;ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
+					server_name += ret[firstOcc + i];
+				//real_name
+				if ((firstOcc = ret.find_first_not_of(' ', firstOcc + i)) == std::string::npos)
+					sendMessage(send_rpl_err(461, this, NULL, "USER", ""), this->_sockcom);
+				for (i = 0;ret[firstOcc + i] && endBuf.find(ret[firstOcc + i]) == std::string::npos; i++)
+					real_name += ret[firstOcc + i];
+				if (!(user.empty() || host.empty() || server_name.empty() || real_name.empty()))
+					is_user_good = true;
+				else
+				{
+					sendMessage("Usage: USER [username] [hostname] [server_name] [real_name]", this->_sockcom);
+					is_user_full = false;
+				}
+			}
+			else
+				sendMessage("You need to enter a username\nUsage: USER [username] [hostname] [server_name] [real_name]", this->_sockcom);
+		}
 	}
 	if (is_pass_good == true && _users.size() < 10 && is_nick_good == true && is_user_good == true && isAlive == true)
 	{
@@ -232,9 +246,9 @@ void Server::connectToServer()
         if ((activity < 0) && (errno!=EINTR))
             std::cerr << ("select error") << std::endl;
 		//connect new user
-		if (FD_ISSET(this->_sockserver, &readfds))
+		if (FD_ISSET(this->_sockserver, &readfds) && isAlive == true)
             newConnection();
-		else
+		else if (isAlive == true)
 		{
 			for (int i = 0; i < max_clients; i++)
 			{
@@ -279,7 +293,6 @@ void Server::connectToServer()
 		std::cout << "SERVER RESTARTING..." << std::endl;
 		connectToServer();
 	}
-
 }
 
 std::string Server::receiveMessage() const
