@@ -1,3 +1,5 @@
+#include "main.hpp"
+
 void privmsg(Server *serv, std::string buffer, int sd)
 {
     int i = 0;

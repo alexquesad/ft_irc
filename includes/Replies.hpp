@@ -137,5 +137,4 @@ std::string sendRplErr(int code, Server *serv, User *user, std::string args, std
     (":Your connection is restricted!")
 
 //501
-#define ERR_UMODEUNKNOWNFLAG \
-    (":Unknown MODE flag")
+#define ERR_UMODEUNKNOWNFLAG (":Unknown MODE flag")
