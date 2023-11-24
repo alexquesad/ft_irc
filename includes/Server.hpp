@@ -2,7 +2,6 @@
 
 #include "main.hpp"
 
-class User;
 
 class Server{
 	public:
@@ -32,7 +31,7 @@ class Server{
 		std::string getServerName() const;
 		std::string getPort() const;
 		struct sockaddr_in getServer();
-		void setChannels(std::string channel_name, Channel *chan);
+		void setChannels(std::string channelName, Channel *chan);
 		void setUsers(int sd, User *user);
 		void setIsRestart();
 		int searchUserByNickname(std::string nickname);

@@ -2,7 +2,7 @@
 
 #include "main.hpp"
 
-std::string send_rpl_err(int code, Server *serv, User *user, std::string args, std::string args2);
+std::string sendRplErr(int code, Server *serv, User *user, std::string args, std::string args2);
 
 //RPL
 
@@ -30,22 +30,6 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
 #define RPL_UMODEIS(args) \
     (args)
 
-//301
-#define RPL_AWAY(nick) \
-    (nick + " :Message has been sent !")
-
-//315
-#define RPL_ENDOFWHO(name) \
-    (name + " :End of WHO list")
-
-//322
-#define RPL_LIST(channel) \
-    (channel +" <# visible> :<topic>")
-
-//323
-#define RPL_LISTEND \
-    (":End of LIST")
-
 //324
 #define RPL_CHANNELMODEIS(channel, modes) \
     (channel + " " + modes)
@@ -58,17 +42,9 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
 #define RPL_TOPIC(channel, topic) \
     (channel + " :" + topic)
 
-//341
-#define RPL_INVITING(channel, nick) \
-    (channel + " " + nick)
-
-//351
-#define RPL_VERSION \
-    (ver ".<debuglevel> " SERVER_NAME " :<comments>")
-
 //353
-#define RPL_NAMREPLY(channel, list_of_users) \
-    ("= " + channel + " :" + list_of_users)
+#define RPL_NAMREPLY(channel, listOfUsers) \
+    ("= " + channel + " :" + listOfUsers)
 
 //366
 #define RPL_ENDOFNAMES(channel) \
@@ -82,18 +58,6 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
 #define RPL_ENDOFBANLIST(channel) \
     (channel + " :End of channel ban list")
 
-//372
-#define RPL_MOTD \
-    (":- <text>")
-
-//375
-#define RPL_MOTDSTART \
-    (":- " SERVER_NAME " Message of the day - ")
-
-//376
-#define RPL_ENDOFMOTD \
-    (":End of MOTD command")
-
 //381
 #define RPL_YOUREOPER \
     (":You are now an IRC operator")
@@ -103,10 +67,6 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
 //401
 #define ERR_NOSUCHNICK(nick) \
     (nick + " :No such nick/channel")
-
-//402
-#define ERR_NOSUCHSERVER \
-    (SERVER_NAME " :No such server")
 
 //403
 #define ERR_NOSUCHCHANNEL(channel) \
@@ -119,30 +79,6 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
 //405
 #define ERR_TOOMANYCHANNELS(channel) \
     (channel + " :You have joined too many channels")
-
-//411
-#define ERR_NORECIPIENT \
-    (":No recipient given (<command>)")
-
-//412
-#define ERR_NOTEXTTOSEND \
-    (":No text to send")
-
-//413
-#define ERR_NOTOPLEVEL \
-    ("<mask> :No toplevel domain specified")
-
-//414
-#define ERR_WILDTOPLEVEL \
-    ("<mask> :Wildcard in toplevel domain")
-
-//421
-#define ERR_UNKNOWNCOMMAND \
-    ("<command> :Unknown command")
-
-//422
-#define ERR_NOMOTD \
-    (":MOTD File is missing")
 
 //431
 #define ERR_NONICKNAMEGIVEN \
@@ -164,37 +100,17 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
 #define ERR_NOTONCHANNEL(channel) \
     (channel + " :You're not on that channel")
 
-//443
-#define ERR_USERONCHANNEL(user, channel) \
-    (user + " " + channel " :is already on channel")
-
-//451
-#define ERR_NOTREGISTERED \
-    (":You have not registered")
-
 //461
 #define ERR_NEEDMOREPARAMS(command) \
     (command + " :Not enough parameters")
-
-//462
-#define ERR_ALREADYREGISTRED \
-    (":Unauthorized command (already registered)")
 
 //464
 #define ERR_PASSWDMISMATCH \
     (":Password incorrect")
 
-//467
-#define ERR_KEYSET(channel) \
-    (channel + " :Channel key already set")
-
 //471
 #define ERR_CHANNELISFULL(channel) \
     (channel + " :Cannot join channel (+l)")
-
-//472
-#define ERR_UNKNOWNMODE(channel) \
-    ("<char> :is unknown mode char to me for " + channel)
 
 //473
 #define ERR_INVITEONLYCHAN(channel) \
@@ -207,10 +123,6 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
 //475
 #define ERR_BADCHANNELKEY(channel) \
     (channel + " :Cannot join channel (+k)")
-
-//476
-#define ERR_BADCHANMASK(channel) \
-    (channel + " :Bad Channel Mask")
 
 //481
 #define ERR_NOPRIVILEGES \
@@ -227,7 +139,3 @@ std::string send_rpl_err(int code, Server *serv, User *user, std::string args, s
 //501
 #define ERR_UMODEUNKNOWNFLAG \
     (":Unknown MODE flag")
-
-//502
-#define ERR_USERSDONTMATCH (":Cannot change mode for other users")
-    

@@ -48,13 +48,13 @@ void User::setMode(std::string mode)
     this->_mode = mode;
 }
 
-void User::addChannel(std::string channel_name)
+void User::addChannel(std::string channelName)
 {
-    if (this->_channels.find(channel_name) == this->_channels.end())
-        this->_channels.insert(channel_name);
+    if (this->_channels.find(channelName) == this->_channels.end())
+        this->_channels.insert(channelName);
 }
 
-void User::setNick(std::string new_nickname)
+void User::setNick(std::string newNickname)
 {
-    this->_nickname = new_nickname;
+    this->_nickname = newNickname;
 }

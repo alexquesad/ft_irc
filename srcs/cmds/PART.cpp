@@ -5,36 +5,36 @@ void    part(Server *serv, std::string buffer, int sd)
     int i = 0;
     std::string buf(buffer);
     for (; buf[5 + i] && sep.find(buf[5 + i]) == std::string::npos; i++);
-    std::string channels_name(buf.substr(5, i));
-    if (channels_name.empty())
+    std::string channelsName(buf.substr(5, i));
+    if (channelsName.empty())
     {
-        sendMessage(send_rpl_err(461, serv, FIND_USER(sd), "PART", ""), sd);
+        sendMessage(sendRplErr(461, serv, FIND_USER(sd), "PART", ""), sd);
         return;
     }
-    int nb_of_channels = 1 + std::count(channels_name.begin(), channels_name.end(), ',');
-    for (int i = 0; i < nb_of_channels; i++)
+    int nbOfChannels = 1 + std::count(channelsName.begin(), channelsName.end(), ',');
+    for (int i = 0; i < nbOfChannels; i++)
     {
-        std::string channel_name = channels_name.substr(0, channels_name.find(","));
-        channels_name.erase(0, channels_name.find(",") + 1);
-        if (serv->getChannels().find(channel_name) == serv->getChannels().end())
-            sendMessage(send_rpl_err(403, serv, FIND_USER(sd), channel_name, ""), sd);
-        else if (FIND_USER(sd)->getChannels().find(channel_name) == FIND_USER(sd)->getChannels().end())
-            sendMessage(send_rpl_err(442, serv, FIND_USER(sd), channel_name, ""), sd);
+        std::string channelName = channelsName.substr(0, channelsName.find(","));
+        channelsName.erase(0, channelsName.find(",") + 1);
+        if (serv->getChannels().find(channelName) == serv->getChannels().end())
+            sendMessage(sendRplErr(403, serv, FIND_USER(sd), channelName, ""), sd);
+        else if (FIND_USER(sd)->getChannels().find(channelName) == FIND_USER(sd)->getChannels().end())
+            sendMessage(sendRplErr(442, serv, FIND_USER(sd), channelName, ""), sd);
         else
         {
-            std::string user_answer = userOutput(FIND_USER(sd));
-            user_answer += buffer;
-            if (FIND_CHANNEL(channel_name)->getMode().find("a") == std::string::npos)
-                sendEveryoneInChan(user_answer, FIND_CHANNEL(channel_name));
+            std::string userAnswer = userOutput(FIND_USER(sd));
+            userAnswer += buffer;
+            if (FIND_CHANNEL(channelName)->getMode().find("a") == std::string::npos)
+                sendEveryoneInChan(userAnswer, FIND_CHANNEL(channelName));
             else
-                sendMessage(user_answer, sd);
-            FIND_CHANNEL(channel_name)->leftUser(sd);
-            if (FIND_CHANNEL(channel_name)->getUsersNumber() == 0)
+                sendMessage(userAnswer, sd);
+            FIND_CHANNEL(channelName)->leftUser(sd);
+            if (FIND_CHANNEL(channelName)->getUsersNumber() == 0)
             {
-                delete serv->getChannels().find(channel_name)->second;
-                serv->getChannels().erase(channel_name);
+                delete serv->getChannels().find(channelName)->second;
+                serv->getChannels().erase(channelName);
             }
-            FIND_USER(sd)->getChannels().erase(channel_name);
+            FIND_USER(sd)->getChannels().erase(channelName);
         }
     }
 }

@@ -4,7 +4,7 @@ void restart(Server *serv, std::string buffer, int sd)
 {
 	(void)buffer;
 	if (FIND_USER(sd)->getMode().find('o') == std::string::npos)
-        sendMessage(send_rpl_err(481, serv, FIND_USER(sd), "", ""), sd);
+        sendMessage(sendRplErr(481, serv, FIND_USER(sd), "", ""), sd);
 	else
 		serv->setIsRestart();
 }

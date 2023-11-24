@@ -6,38 +6,38 @@ void oper(Server *serv, std::string buffer, int sd)
     std::string password;
     std::string user;
     int i = 0;
-    for (int j = 0;buffer[i] && j < 1; i++)
+    for (int j = 0; buffer[i] && j < 1; i++)
         if (buffer[i] == ' ')
             j++;
     int k = 0;
-    for (int j = 0;buffer[k] && j < 2; k++)
+    for (int j = 0; buffer[k] && j < 2; k++)
         if (buffer[k] == ' ')
             j++;
     user = buf.substr(i, k - i - 1);
     if (user.empty())
     {
-        sendMessage(send_rpl_err(461, serv, FIND_USER(sd), "OPER", ""), sd);
+        sendMessage(sendRplErr(461, serv, FIND_USER(sd), "OPER", ""), sd);
         return;
     }
     if (serv->searchUserByNickname(user) == -1)
     {
-        sendMessage(send_rpl_err(401, serv, FIND_USER(sd), user, ""), sd);
+        sendMessage(sendRplErr(401, serv, FIND_USER(sd), user, ""), sd);
         return ;
     }
     password = buf.substr(k, buf.find('\r') != std::string::npos ? buf.length() - 2 - k : buf.length() - 1 - k);
     if (password.empty())
     {
-        sendMessage(send_rpl_err(461, serv, FIND_USER(sd), "OPER", ""), sd);
+        sendMessage(sendRplErr(461, serv, FIND_USER(sd), "OPER", ""), sd);
         return;
     }
     if (password.compare(OPER_PW) == 0)
     {
-        std:: string user_answer = userOutput(FIND_USER(serv->searchUserByNickname(user)));
-        user_answer += "MODE " + FIND_USER(serv->searchUserByNickname(user))->getNickname() + " +o";
+        std:: string userAnswer = userOutput(FIND_USER(serv->searchUserByNickname(user)));
+        userAnswer += "MODE " + FIND_USER(serv->searchUserByNickname(user))->getNickname() + " +o";
         FIND_USER(serv->searchUserByNickname(user))->setMode(FIND_USER(serv->searchUserByNickname(user))->getMode() + "o");
-        sendMessage(user_answer, serv->searchUserByNickname(user));
-        sendMessage(send_rpl_err(381, serv, FIND_USER(serv->searchUserByNickname(user)), "", ""), serv->searchUserByNickname(user));
+        sendMessage(userAnswer, serv->searchUserByNickname(user));
+        sendMessage(sendRplErr(381, serv, FIND_USER(serv->searchUserByNickname(user)), "", ""), serv->searchUserByNickname(user));
     }
     else
-        sendMessage(send_rpl_err(464, serv, FIND_USER(serv->searchUserByNickname(user)), "", ""), sd);
+        sendMessage(sendRplErr(464, serv, FIND_USER(serv->searchUserByNickname(user)), "", ""), sd);
 }

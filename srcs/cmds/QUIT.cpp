@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-extern int client_socket[max_clients];
+extern int clientSocket[maxClients];
 
 void disconnectUser(Server* serv, int sd)
 {
@@ -22,9 +22,9 @@ void disconnectUser(Server* serv, int sd)
     delete FIND_USER(sd);
     serv->getUsers().erase(sd);
     std::cout << "Host disconnected , ip " << inet_ntoa(serv->getServer().sin_addr) << " , port " << ntohs(serv->getServer().sin_port) << " , number of users: " <<  serv->getUsers().size() << std::endl;
-    for (int i = 0; i < max_clients; i++)
-        if (client_socket[i] == sd)
-            client_socket[i] = 0;
+    for (int i = 0; i < maxClients; i++)
+        if (clientSocket[i] == sd)
+            clientSocket[i] = 0;
     close(sd);
 }
 
@@ -32,7 +32,7 @@ void quit(Server *serv, std::string buffer, int sd)
 {
     std::string buf(buffer);
     int i = 0;
-    for (;buf[i + 5] && sep.find(buf[i + 5]) == std::string::npos; i++);
+    for (; buf[i + 5] && sep.find(buf[i + 5]) == std::string::npos; i++);
     std::string message = buf.substr(5, i);
     std::string userAnswer;
     if (!message.empty())

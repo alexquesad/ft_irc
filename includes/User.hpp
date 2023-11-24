@@ -21,7 +21,7 @@ class User{
 		std::set<std::string> &getChannels();
 		size_t getChannelsSize() const;
 		std::string getMode() const;
-		void addChannel(std::string channel_name);
-		void setNick(std::string new_nickname);
+		void addChannel(std::string channelName);
+		void setNick(std::string newNickname);
 		void setMode(std::string mode);
 };

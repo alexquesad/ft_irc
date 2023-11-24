@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-int client_socket[max_clients];
+int clientSocket[maxClients];
 bool isAlive = true;
 
 Server::Server(const std::string &port, const std::string &password) : _port(port), _password(password), _serverName(), _isRestart(false){
@@ -61,9 +61,9 @@ void Server::newConnection(void)
 	//send new connection greeting message
 	size_t occ;
 	size_t firstOcc;
-	bool is_pass_good = false, is_nick_good = false, is_user_good = false;
-	bool is_nick_available = true, is_user_full = true;
-	std::string nick, user, host, server_name, real_name, pass, buffer;
+	bool isPassGood = false, isNickGood = false, isUserGood = false;
+	bool isNickAvailable = true, isUserFull = true;
+	std::string nick, user, host, serverName, realName, pass, buffer;
 
 	ret = this->receiveMessage();
 	std::cout << "{" << ret << "}" << std::endl;
@@ -74,16 +74,16 @@ void Server::newConnection(void)
 	{
 		if ((firstOcc = ret.find_first_not_of(' ', occ + 5)) == std::string::npos)
 		{
-			sendMessage(send_rpl_err(461, this, NULL, "PASS", ""), this->_sockcom);
+			sendMessage(sendRplErr(461, this, NULL, "PASS", ""), this->_sockcom);
 			close(this->_sockcom);
 		}
 		else
 		{
-			for (int i = 0;ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
+			for (int i = 0; ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
 				pass += ret[firstOcc + i];
 			if (pass.empty())
 			{
-				sendMessage(send_rpl_err(461, this, NULL, "PASS", ""), this->_sockcom);
+				sendMessage(sendRplErr(461, this, NULL, "PASS", ""), this->_sockcom);
 				close(this->_sockcom);
 			}
 			else if (pass.compare(this->_password) != 0)
@@ -92,7 +92,7 @@ void Server::newConnection(void)
 				close(this->_sockcom);
 			}
 			else
-				is_pass_good = true;
+				isPassGood = true;
 		}
 	}
 	else
@@ -100,36 +100,36 @@ void Server::newConnection(void)
 		sendMessage("You need to enter a pass!", this->_sockcom);
 		close(this->_sockcom);
 	}
-	if (is_pass_good == true)
+	if (isPassGood == true)
 	{
-		if (ret.find("NICK ") == std::string::npos || is_nick_available == false)
+		if (ret.find("NICK ") == std::string::npos || isNickAvailable == false)
 			ret = this->receiveMessage();
-		is_nick_available = true;
+		isNickAvailable = true;
 		if ((occ = ret.find("NICK ")) != std::string::npos)
 		{
 			if ((firstOcc = ret.find_first_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz[]\\`_^{|}0123456789-", occ +5)) == std::string::npos)
 			{
-				sendMessage(send_rpl_err(432, this, NULL, nick, ""), this->_sockcom);
+				sendMessage(sendRplErr(432, this, NULL, nick, ""), this->_sockcom);
 				close(this->_sockcom);
 			}
 			else
 			{
-				for (int i = 0;ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
+				for (int i = 0; ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
 					nick += ret[firstOcc + i];
-				if (!nickname_is_valid(nick))
+				if (!nicknameIsValid(nick))
 				{
-					sendMessage(send_rpl_err(432, this, NULL, nick, ""), this->_sockcom);
+					sendMessage(sendRplErr(432, this, NULL, nick, ""), this->_sockcom);
 					close(this->_sockcom);	
 				}
 				else if (nicknameIsInUse(this, nick))
 				{
-					sendMessage(send_rpl_err(433, this, NULL, nick, ""), this->_sockcom);
+					sendMessage(sendRplErr(433, this, NULL, nick, ""), this->_sockcom);
 					sendMessage("Please try reconnect with an available nickname.", this->_sockcom);
-					is_nick_available = false;
+					isNickAvailable = false;
 					close(this->_sockcom);
 				}
 				else
-					is_nick_good = true;
+					isNickGood = true;
 			}
 		}
 		else
@@ -137,69 +137,69 @@ void Server::newConnection(void)
 			sendMessage("You have to enter a nickname\nUsage: NICK [nickname]", this->_sockcom);
 			close(this->_sockcom);
 		}
-		while (is_user_good == false && is_nick_good == true)
+		while (isUserGood == false && isNickGood == true)
 		{
-			if (ret.find("USER ") == std::string::npos || is_user_full == false)
+			if (ret.find("USER ") == std::string::npos || isUserFull == false)
 				ret = this->receiveMessage();
 			if ((occ = ret.find("USER ")) != std::string::npos)
 			{
 				int i = 0;
 				//username
 				if ((firstOcc = ret.find_first_not_of(' ', occ + 5)) == std::string::npos)
-					sendMessage(send_rpl_err(461, this, NULL, "USER", ""), this->_sockcom);
-				for (;ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
+					sendMessage(sendRplErr(461, this, NULL, "USER", ""), this->_sockcom);
+				for (; ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
 					user += ret[firstOcc + i];
 				//hostname
 				if ((firstOcc = ret.find_first_not_of(' ', firstOcc + i)) == std::string::npos)
-					sendMessage(send_rpl_err(461, this, NULL, "USER", ""), this->_sockcom);
-				for (i = 0;ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
+					sendMessage(sendRplErr(461, this, NULL, "USER", ""), this->_sockcom);
+				for (i = 0; ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
 					host += ret[firstOcc + i];
-				//server_name
+				//serverName
 				if ((firstOcc = ret.find_first_not_of(' ', firstOcc + i)) == std::string::npos)
-					sendMessage(send_rpl_err(461, this, NULL, "USER", ""), this->_sockcom);
-				for (i = 0;ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
-					server_name += ret[firstOcc + i];
-				//real_name
+					sendMessage(sendRplErr(461, this, NULL, "USER", ""), this->_sockcom);
+				for (i = 0; ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
+					serverName += ret[firstOcc + i];
+				//realName
 				if ((firstOcc = ret.find_first_not_of(' ', firstOcc + i)) == std::string::npos)
-					sendMessage(send_rpl_err(461, this, NULL, "USER", ""), this->_sockcom);
-				for (i = 0;ret[firstOcc + i] && endBuf.find(ret[firstOcc + i]) == std::string::npos; i++)
-					real_name += ret[firstOcc + i];
-				if (!(user.empty() || host.empty() || server_name.empty() || real_name.empty()))
-					is_user_good = true;
+					sendMessage(sendRplErr(461, this, NULL, "USER", ""), this->_sockcom);
+				for (i = 0; ret[firstOcc + i] && endBuf.find(ret[firstOcc + i]) == std::string::npos; i++)
+					realName += ret[firstOcc + i];
+				if (!(user.empty() || host.empty() || serverName.empty() || realName.empty()))
+					isUserGood = true;
 				else
 				{
-					sendMessage("Usage: USER [username] [hostname] [server_name] [real_name]", this->_sockcom);
-					is_user_full = false;
+					sendMessage("Usage: USER [username] [hostname] [serverName] [realName]", this->_sockcom);
+					isUserFull = false;
 				}
 			}
 			else
-				sendMessage("You need to enter a username\nUsage: USER [username] [hostname] [server_name] [real_name]", this->_sockcom);
+				sendMessage("You need to enter a username\nUsage: USER [username] [hostname] [serverName] [realName]", this->_sockcom);
 		}
 	}
-	if (is_pass_good == true && _users.size() < 10 && is_nick_good == true && is_user_good == true && isAlive == true)
+	if (isPassGood == true && _users.size() < 10 && isNickGood == true && isUserGood == true && isAlive == true)
 	{
-		this->_serverName = server_name;
-		User *new_user = new User(nick, user, host, real_name);
-		this->setUsers(this->_sockcom, new_user);
+		this->_serverName = serverName;
+		User *newUser = new User(nick, user, host, realName);
+		this->setUsers(this->_sockcom, newUser);
 		std::cout << "number of user connected to the server: " << this->_users.size() << std::endl;
-		sendMessage(send_rpl_err(001, this, new_user, "", ""), this->_sockcom);
-		sendMessage(send_rpl_err(002, this, new_user, "", ""), this->_sockcom);
-		sendMessage(send_rpl_err(003, this, new_user, "", ""), this->_sockcom);
-		sendMessage(send_rpl_err(004, this, new_user, "", ""), this->_sockcom);
+		sendMessage(sendRplErr(001, this, newUser, "", ""), this->_sockcom);
+		sendMessage(sendRplErr(002, this, newUser, "", ""), this->_sockcom);
+		sendMessage(sendRplErr(003, this, newUser, "", ""), this->_sockcom);
+		sendMessage(sendRplErr(004, this, newUser, "", ""), this->_sockcom);
 		//add new socket to array of sockets
-		for (int i = 0; i < max_clients; i++)
+		for (int i = 0; i < maxClients; i++)
 		{
 			//if position is empty
-			if( client_socket[i] == 0 )
+			if (clientSocket[i] == 0)
 			{
-				client_socket[i] = this->_sockcom;
+				clientSocket[i] = this->_sockcom;
 				std::cout << "Adding to list of sockets as " << i << std::endl;
 				break;
 			}
 		}
 	}
-	else if (is_pass_good == true && is_nick_good == true && isAlive == true)
-		sendMessage(send_rpl_err(005, this, NULL, nick, ""), this->_sockcom);
+	else if (isPassGood == true && isNickGood == true && isAlive == true)
+		sendMessage(sendRplErr(005, this, NULL, nick, ""), this->_sockcom);
 }
 
 void    handler(int signum)
@@ -213,34 +213,33 @@ void Server::connectToServer()
 {
 	this->_sockserver = newSocket();
 	fd_set readfds;
-	int sd, activity, max_sd;
-	for (int i = 0; i < max_clients; i++)
-        client_socket[i] = 0;
+	int sd, activity, maxSd;
+	for (int i = 0; i < maxClients; i++)
+        clientSocket[i] = 0;
 	std::cout << "listening..." << std::endl;
 	while (this->_isRestart == false && isAlive == true)
 	{
     	std::signal(SIGINT, handler);
-		// signal(SIGQUIT, SIG_IGN);
 		//clear the socket set
         FD_ZERO(&readfds);
         //add master socket to set
         FD_SET(this->_sockserver, &readfds);
-        max_sd = this->_sockserver;
+        maxSd = this->_sockserver;
         //add child sockets to set
-        for (int i = 0; i < max_clients; i++)
+        for (int i = 0; i < maxClients; i++)
         {
             //socket descriptor
-            sd = client_socket[i];
+            sd = clientSocket[i];
             //if valid socket descriptor then add to read list
             if (sd > 0)
                 FD_SET( sd , &readfds);
             //highest file descriptor number, need it for the select function
-            if (sd > max_sd)
-                max_sd = sd;
+            if (sd > maxSd)
+                maxSd = sd;
         }
         //wait for an activity on one of the sockets , timeout is NULL ,
         //so wait indefinitely
-        activity = select( max_sd + 1 , &readfds , NULL , NULL , NULL);
+        activity = select( maxSd + 1 , &readfds , NULL , NULL , NULL);
         if ((activity < 0) && (errno!=EINTR))
             std::cerr << ("select error") << std::endl;
 		//connect new user
@@ -248,9 +247,9 @@ void Server::connectToServer()
             newConnection();
 		else if (isAlive == true)
 		{
-			for (int i = 0; i < max_clients; i++)
+			for (int i = 0; i < maxClients; i++)
 			{
-				sd = client_socket[i];
+				sd = clientSocket[i];
 				if (FD_ISSET( sd , &readfds))
 				{
 					std::string buf;
@@ -272,12 +271,12 @@ void Server::connectToServer()
 		}
 	}
 	clearAll();
-	for (int i = 0; i < max_clients; i++)
+	for (int i = 0; i < maxClients; i++)
 	{
-		if (client_socket[i] != 0)
+		if (clientSocket[i] != 0)
 		{
-			close(client_socket[i]);
-			client_socket[i] = 0;
+			close(clientSocket[i]);
+			clientSocket[i] = 0;
 		}
 	}
 	close(this->_sockserver);
@@ -325,9 +324,9 @@ struct sockaddr_in Server::getServer()
 	return this->_server;
 }
 
-void Server::setChannels(std::string channel_name, Channel *chan)
+void Server::setChannels(std::string channelName, Channel *chan)
 {
-	this->_channels.insert(std::make_pair(channel_name, chan));
+	this->_channels.insert(std::make_pair(channelName, chan));
 }
 
 void Server::setUsers(int sd, User *user)
