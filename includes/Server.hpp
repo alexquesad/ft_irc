@@ -27,7 +27,7 @@ class Server{
 		void connectToServer();
 		std::map<std::string, Channel*> & getChannels();
 		std::map<int, User*> & getUsers() ;
-		std::string receiveMessage() const;
+		std::string receiveMessage(int sd) const;
 		std::string getServerName() const;
 		std::string getPort() const;
 		struct sockaddr_in getServer();

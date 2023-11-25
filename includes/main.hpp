@@ -40,7 +40,7 @@
 #define CHECKCHANNELMODE(channelName, mode) \
     FIND_CHANNEL(channelName)->getMode().find(mode) == std::string::npos ? true : false
 
-#define maxClients 1024
+#define maxClients 10
 
 #define endBuf std::string("\r\n")
 #define sep std::string(" \r\n")

@@ -65,11 +65,9 @@ void Server::newConnection(void)
 	bool isNickAvailable = true, isUserFull = true;
 	std::string nick, user, host, serverName, realName, pass, buffer;
 
-	ret = this->receiveMessage();
-	std::cout << "{" << ret << "}" << std::endl;
+	ret = this->receiveMessage(this->_sockcom);
 	if (((ret.find("CAP LS") != std::string::npos && ret.find("PASS ") == std::string::npos) || (ret.find("CAP LS") != std::string::npos && ret.find("PASS ") == std::string::npos && ret.find("NICK ") != std::string::npos)) && ret.find("USER ") == std::string::npos)
-		ret = this->receiveMessage();
-	std::cout << "[" << ret << "]" << std::endl;
+		ret = this->receiveMessage(this->_sockcom);
 	if ((occ = ret.find("PASS ")) != std::string::npos)
 	{
 		if ((firstOcc = ret.find_first_not_of(' ', occ + 5)) == std::string::npos)
@@ -103,7 +101,7 @@ void Server::newConnection(void)
 	if (isPassGood == true)
 	{
 		if (ret.find("NICK ") == std::string::npos || isNickAvailable == false)
-			ret = this->receiveMessage();
+			ret = this->receiveMessage(this->_sockcom);
 		isNickAvailable = true;
 		if ((occ = ret.find("NICK ")) != std::string::npos)
 		{
@@ -116,6 +114,7 @@ void Server::newConnection(void)
 			{
 				for (int i = 0; ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
 					nick += ret[firstOcc + i];
+				std::cout << "sockcom id is: " << this->_sockcom << std::endl;
 				if (!nicknameIsValid(nick))
 				{
 					sendMessage(sendRplErr(432, this, NULL, nick, ""), this->_sockcom);
@@ -140,7 +139,7 @@ void Server::newConnection(void)
 		while (isUserGood == false && isNickGood == true)
 		{
 			if (ret.find("USER ") == std::string::npos || isUserFull == false)
-				ret = this->receiveMessage();
+				ret = this->receiveMessage(this->_sockcom);
 			if ((occ = ret.find("USER ")) != std::string::npos)
 			{
 				int i = 0;
@@ -232,15 +231,15 @@ void Server::connectToServer()
             sd = clientSocket[i];
             //if valid socket descriptor then add to read list
             if (sd > 0)
-                FD_SET( sd , &readfds);
+                FD_SET(sd , &readfds);
             //highest file descriptor number, need it for the select function
             if (sd > maxSd)
                 maxSd = sd;
         }
         //wait for an activity on one of the sockets , timeout is NULL ,
         //so wait indefinitely
-        activity = select( maxSd + 1 , &readfds , NULL , NULL , NULL);
-        if ((activity < 0) && (errno!=EINTR))
+        activity = select(maxSd + 1 , &readfds , NULL , NULL , NULL);
+        if ((activity < 0) && (errno != EINTR))
             std::cerr << ("select error") << std::endl;
 		//connect new user
 		if (FD_ISSET(this->_sockserver, &readfds) && isAlive == true)
@@ -250,12 +249,12 @@ void Server::connectToServer()
 			for (int i = 0; i < maxClients; i++)
 			{
 				sd = clientSocket[i];
-				if (FD_ISSET( sd , &readfds))
+				if (FD_ISSET(sd , &readfds))
 				{
 					std::string buf;
 					//Check if it was for closing , and also read the
 					//incoming message
-					buf = receiveMessage();
+					buf = receiveMessage(sd);
 					std::cout << "\033[1;34mRECV RETOUR :\033[0m " << buf << "]";
 					std::string command(buf);
 					int occ = 0;
@@ -288,13 +287,13 @@ void Server::connectToServer()
 	}
 }
 
-std::string Server::receiveMessage() const
+std::string Server::receiveMessage(int sd) const
 {
 	char buffer[1024];
 	std::string buf = "";
 	memset(buffer, 0, 1024);
 	while ((buf += buffer).find('\n') == std::string::npos && isAlive == true)
-		if (recv(this->_sockcom, buffer, 1024, 0) < 0)
+		if (recv(sd, buffer, 1024, 0) < 0)
 			throw std::runtime_error("Error receiving message");
 	return buf;
 }
