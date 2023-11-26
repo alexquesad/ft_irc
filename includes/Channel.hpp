@@ -43,5 +43,5 @@ class Channel
         std::string getListOfUserBan();
         bool isChanop(int sd);
         bool isVoices(int sd);
-        bool isBan(std::string username);
+        bool isBan(std::string nickname);
 };

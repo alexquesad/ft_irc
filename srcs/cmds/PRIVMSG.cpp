@@ -2,21 +2,26 @@
 
 void privmsg(Server *serv, std::string buffer, int sd)
 {
-    int i = 0;
     int occAfterCmd;
     std::string buf(buffer);
     if (buf.compare(0, 6, "NOTICE") == 0)
         occAfterCmd = 7;
     else
         occAfterCmd = 8;
-    for (; buf[occAfterCmd + i] && sep.find(buf[occAfterCmd + i]) == std::string::npos; i++);
-    std::string msgtarget(buf.substr(occAfterCmd, i));
+    size_t i;
+    std::string msgtarget = "";
+    if ((i = buf.find_first_not_of(sep, occAfterCmd)) != std::string::npos)
+        msgtarget = buf.substr(i, (buf.find_first_of(sep, i) - i));
+    std::string msg = "";
+    size_t j;
+    j = buf.find_first_of(sep, i);
+    if ((j = buf.find_first_not_of(sep, j)) != std::string::npos)
+        msg = buf.substr(j, (buf.find_first_of(endBuf, j) - j));
     std::string idOfChannel = "#&+";
-
     int userToSendSd;
     std::string userAnswer;
     userAnswer = userOutput(FIND_USER(sd));
-    userAnswer += buffer;
+    userAnswer += "PRIVMSG " + msgtarget + " " + msg;
     if (!msgtarget.empty() && idOfChannel.find(msgtarget[0]) != std::string::npos)
     {
         if (serv->getChannels().find(msgtarget) == serv->getChannels().end())
@@ -25,11 +30,11 @@ void privmsg(Server *serv, std::string buffer, int sd)
             sendMessage(sendRplErr(404, serv, FIND_USER(sd), msgtarget, ""), sd);
         else if ((FIND_CHANNEL(msgtarget)->getMode().find("m") != std::string::npos) && (!FIND_CHANNEL(msgtarget)->isChanop(sd)) && (!FIND_CHANNEL(msgtarget)->isVoices(sd)))
             sendMessage(sendRplErr(404, serv, FIND_USER(sd), msgtarget, ""), sd);
-		else if (FIND_CHANNEL(msgtarget)->isBan(FIND_USER(sd)->getNickname()) == true || FIND_CHANNEL(msgtarget)->isBan(FIND_USER(sd)->getUsername()) == true || FIND_CHANNEL(msgtarget)->isBan(FIND_USER(sd)->getHostname()) == true)
+		else if (FIND_CHANNEL(msgtarget)->isBan(FIND_USER(sd)->getNickname()) == true)
             sendMessage(sendRplErr(404, serv, FIND_USER(sd), msgtarget, ""), sd);
         else if ((FIND_CHANNEL(msgtarget)->getMode().find("a") != std::string::npos))
         {
-            userAnswer = anonymousOutput() + buffer;
+            userAnswer = anonymousOutput() + "PRIVMSG " + msgtarget + " " + msg;
             sendEveryoneInChanExceptUser(userAnswer, FIND_CHANNEL(msgtarget), sd);
         }
         else

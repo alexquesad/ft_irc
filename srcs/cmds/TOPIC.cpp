@@ -2,10 +2,11 @@
 
 void topic(Server *serv, std::string buffer, int sd)
 {
-    int i = 0;
     std::string buf(buffer);
-    for (; buf[6 + i] && sep.find(buf[6 + i]) == std::string::npos; i++);
-    std::string channelName(buf.substr(6, i));
+    size_t i, j = 0;
+    std::string channelName = "";
+    if ((i = buf.find_first_not_of(sep, 6)) != std::string::npos)
+        channelName = buf.substr(i, ((j = buf.find_first_of(sep, i)) - i));
     if (channelName.empty())
         sendMessage(sendRplErr(461, serv, FIND_USER(sd), "TOPIC", ""), sd);
     else if (serv->getChannels().find(channelName) == serv->getChannels().end())
@@ -16,18 +17,26 @@ void topic(Server *serv, std::string buffer, int sd)
         sendMessage(sendRplErr(484, serv, FIND_USER(sd), "", ""), sd);
     else if ((FIND_CHANNEL(channelName)->getMode().find("t") != std::string::npos) && (FIND_CHANNEL(channelName)->getChanops().find(sd) == FIND_CHANNEL(channelName)->getChanops().end()))
         sendMessage(sendRplErr(482, serv, FIND_USER(sd), channelName, ""), sd);
-    else if (buf.find(':') == std::string::npos)
-        sendMessage(sendRplErr(461, serv, FIND_USER(sd), "TOPIC", ""), sd);
     else
     {
-        std::string topic(buf.substr(buf.find(':') + 1));
-        topic = topic.substr(0, topic.find('\r') != std::string::npos ? topic.length() - 2 : topic.length() - 1);
-        FIND_CHANNEL(channelName)->setTopic(topic);
-        sendMessage(sendRplErr(332, serv, FIND_USER(sd), channelName, FIND_CHANNEL(channelName)->getTopic()), sd);
-        std::string userAnswer = userOutput(FIND_USER(sd));
-        if (FIND_CHANNEL(channelName)->getMode().find("a") != std::string::npos)
-            userAnswer = anonymousOutput();
-        userAnswer += buffer;
-        sendEveryoneInChan(userAnswer, FIND_CHANNEL(channelName));
+        std::string topic = "";
+        if ((j = buf.find_first_not_of(sep, j)) != std::string::npos)
+        {
+            if (buf[j] == ':')
+                j++;
+            topic = buf.substr(j, (buf.find_first_of(endBuf, j) - j));
+        }
+        if (topic.empty())
+            sendMessage(sendRplErr(332, serv, FIND_USER(sd), channelName, FIND_CHANNEL(channelName)->getTopic()), sd);
+        else
+        {
+            FIND_CHANNEL(channelName)->setTopic(topic);
+            sendMessage(sendRplErr(332, serv, FIND_USER(sd), channelName, FIND_CHANNEL(channelName)->getTopic()), sd);
+            std::string userAnswer = userOutput(FIND_USER(sd));
+            if (FIND_CHANNEL(channelName)->getMode().find("a") != std::string::npos)
+                userAnswer = anonymousOutput();
+            userAnswer += "TOPIC " + FIND_CHANNEL(channelName)->getTopic();
+            sendEveryoneInChan(userAnswer, FIND_CHANNEL(channelName));
+        }
     }
 }

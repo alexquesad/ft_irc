@@ -159,7 +159,7 @@ std::string Channel::getListOfUserBan()
     for (std::map<std::string, std::string>::iterator it = this->_banList.begin(); it != this->_banList.end(); it++)
     {
         if (!output.empty())
-            output += "\n";
+            output += ",";
         output += it->second;
     }
     return (output);
@@ -179,9 +179,9 @@ bool    Channel::isVoices(int sd)
     return (false);
 }
 
-bool Channel::isBan(std::string username)
+bool Channel::isBan(std::string nickname)
 {
-    if (this->_banList.find(username) != this->_banList.end())
+    if (this->_banList.find(nickname) != this->_banList.end())
         return (true);
     return (false);
 }

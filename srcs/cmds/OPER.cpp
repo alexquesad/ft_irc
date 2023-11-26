@@ -3,17 +3,11 @@
 void oper(Server *serv, std::string buffer, int sd)
 {
     std::string buf(buffer);
-    std::string password;
+    int j = 0;
+    size_t i;
     std::string user;
-    int i = 0;
-    for (int j = 0; buffer[i] && j < 1; i++)
-        if (buffer[i] == ' ')
-            j++;
-    int k = 0;
-    for (int j = 0; buffer[k] && j < 2; k++)
-        if (buffer[k] == ' ')
-            j++;
-    user = buf.substr(i, k - i - 1);
+    if ((i = buf.find_first_not_of(sep, 5)) != std::string::npos)
+        user = buf.substr(i, ((j = buf.find_first_of(sep, i)) - i));
     if (user.empty())
     {
         sendMessage(sendRplErr(461, serv, FIND_USER(sd), "OPER", ""), sd);
@@ -22,9 +16,10 @@ void oper(Server *serv, std::string buffer, int sd)
     if (serv->searchUserByNickname(user) == -1)
     {
         sendMessage(sendRplErr(401, serv, FIND_USER(sd), user, ""), sd);
-        return ;
+        return;
     }
-    password = buf.substr(k, buf.find('\r') != std::string::npos ? buf.length() - 2 - k : buf.length() - 1 - k);
+    j = buf.find_first_not_of(sep, j);
+    std::string password = buf.substr(j, (buf.find_first_of(sep, j) - j));
     if (password.empty())
     {
         sendMessage(sendRplErr(461, serv, FIND_USER(sd), "OPER", ""), sd);

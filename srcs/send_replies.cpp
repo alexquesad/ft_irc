@@ -96,6 +96,9 @@ std::string sendRplErr(int code, Server *serv, User *user, std::string args, std
         case 471:
             ret += ERR_CHANNELISFULL(args);
 			break;
+        case 472:
+            ret += ERR_UNKNOWNMODE(args, args2);
+            break;
         case 473:
             ret += ERR_INVITEONLYCHAN(args);
 			break;

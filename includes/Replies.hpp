@@ -112,6 +112,10 @@ std::string sendRplErr(int code, Server *serv, User *user, std::string args, std
 #define ERR_CHANNELISFULL(channel) \
     (channel + " :Cannot join channel (+l)")
 
+//472
+#define ERR_UNKNOWNMODE(char, channel) \
+    (char + " :is an unknown mode for " + channel)
+
 //473
 #define ERR_INVITEONLYCHAN(channel) \
     (channel + " :Cannot join channel (+i)")

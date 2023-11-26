@@ -4,25 +4,22 @@ void kick(Server *serv, std::string buffer, int sd)
 {
     std::string buf(buffer);
     int kickCount = std::count(buf.begin(), buf.end(), '\n');
-    int i = 0;
-    for (; buf[5 + i] && sep.find(buf[5 + i]) == std::string::npos; i++);
-    std::string channelsName(buf.substr(5, i));
+    int k = 0;
+    size_t i, j;
+    std::string channelsName = "";
+    if ((i = buf.find_first_not_of(sep, 5)) != std::string::npos)
+        channelsName = buf.substr(i, ((j = buf.find_first_of(sep, i)) - i));
     if (channelsName.empty())
     {
         sendMessage(sendRplErr(461, serv, FIND_USER(sd), "KICK", ""), sd);
         return;
     }
     int nbOfChannels = 1 + std::count(channelsName.begin(), channelsName.end(), ',');
-    int j = 0;
-    int occBeginNick = i;
-    for (; buf[i] && buf[i] != ':' && endBuf.find(buf[i]) == std::string::npos; i++);
-    for (; buf[i + j] && endBuf.find(buf[i + j]) == std::string::npos; j++);
-    std::string message = buf.substr(i + 1, j - 1);
-    for (int k = 0; k < kickCount; k++)
+    j = buf.find_first_not_of(sep, j);
+    k = j;
+    for (int l = 0; l < kickCount; l++)
     {
-        j = 0;
-        for (; buf[6 + occBeginNick + j] && sep.find(buf[6 + occBeginNick + j]) == std::string::npos; j++);
-        std::string usersNick = buf.substr(occBeginNick + 6, j);
+        std::string usersNick = buf.substr(k, (buf.find_first_of(sep, k) - k));
         int nbUsers = 1 + std::count(usersNick.begin(), usersNick.end(), ',');
         if (usersNick.empty())
         {
@@ -35,8 +32,9 @@ void kick(Server *serv, std::string buffer, int sd)
             usersNick.erase(0, usersNick.find(",") + 1);
             for (int i = 0; i < nbOfChannels; i++)
             {
-                std::string channelName = channelsName.substr(0, channelsName.find(","));
-                channelsName.erase(0, channelsName.find(",") + 1);
+                std::string tmp = channelsName;
+                std::string channelName = tmp.substr(0, tmp.find(","));
+                tmp.erase(0, tmp.find(",") + 1);
                 if (serv->getChannels().find(channelName) == serv->getChannels().end())
                 {
                     if (j == 0)
@@ -67,7 +65,7 @@ void kick(Server *serv, std::string buffer, int sd)
                     continue;
                 }
                 std::string userAnswer = userOutput(FIND_USER(sd));
-                userAnswer += buffer;
+                userAnswer += "PART " + channelName;
                 sendEveryoneInChanExceptUser(userAnswer, FIND_CHANNEL(channelName), userToKickSd);
                 FIND_CHANNEL(channelName)->leftUser(userToKickSd);
                 if (FIND_CHANNEL(channelName)->getUsersNumber() == 0)

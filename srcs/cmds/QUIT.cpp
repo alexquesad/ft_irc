@@ -31,9 +31,10 @@ void disconnectUser(Server* serv, int sd)
 void quit(Server *serv, std::string buffer, int sd)
 {
     std::string buf(buffer);
-    int i = 0;
-    for (; buf[i + 5] && sep.find(buf[i + 5]) == std::string::npos; i++);
-    std::string message = buf.substr(5, i);
+    size_t i;
+    std::string message;
+    if ((i = buf.find_first_not_of(sep, 5)) != std::string::npos)
+        message = buf.substr(i, (buf.find_first_of(sep, i) - i));
     std::string userAnswer;
     if (!message.empty())
         userAnswer = userOutput(FIND_USER(sd)) + buffer;

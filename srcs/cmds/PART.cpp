@@ -2,15 +2,23 @@
 
 void    part(Server *serv, std::string buffer, int sd)
 {
-    int i = 0;
     std::string buf(buffer);
-    for (; buf[5 + i] && sep.find(buf[5 + i]) == std::string::npos; i++);
-    std::string channelsName(buf.substr(5, i));
+    size_t i;
+    std::string channelsName = "";
+    if ((i = buf.find_first_not_of(sep, 5)) != std::string::npos)
+        channelsName = buf.substr(i, (buf.find_first_of(sep, i) - i));
     if (channelsName.empty())
     {
         sendMessage(sendRplErr(461, serv, FIND_USER(sd), "PART", ""), sd);
         return;
     }
+    std::string message = "";
+    size_t j = i;
+    j = buf.find_first_of(sep, j);
+    j = buf.find_first_not_of(sep, j);
+    int u = j;
+    if ((j = buf.find_first_of(endBuf, j)) != std::string::npos)
+        message = buf.substr(u, (buf.find_first_of(endBuf, u) - u));
     int nbOfChannels = 1 + std::count(channelsName.begin(), channelsName.end(), ',');
     for (int i = 0; i < nbOfChannels; i++)
     {
@@ -23,7 +31,7 @@ void    part(Server *serv, std::string buffer, int sd)
         else
         {
             std::string userAnswer = userOutput(FIND_USER(sd));
-            userAnswer += buffer;
+            userAnswer += "PART " + channelName + " " + message;
             if (FIND_CHANNEL(channelName)->getMode().find("a") == std::string::npos)
                 sendEveryoneInChan(userAnswer, FIND_CHANNEL(channelName));
             else
