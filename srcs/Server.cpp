@@ -197,12 +197,12 @@ void Server::newConnection(void)
 			close(this->_sockcom);
 		}
 	}
-	if (isPassGood == true && _users.size() < 1024 && isNickGood == true && isUserGood == true && isAlive == true)
+	if (isPassGood == true && _users.size() < 10 && isNickGood == true && isUserGood == true && isAlive == true)
 	{
 		this->_serverName = serverName;
 		User *newUser = new User(nick, user, host, realName);
 		this->setUsers(this->_sockcom, newUser);
-		std::cout << "number of user connected to the server: " << this->_users.size() << std::endl;
+		std::cout << "Number of users connected on the server: " << this->_users.size() << std::endl;
 		sendMessage(sendRplErr(001, this, newUser, "", ""), this->_sockcom);
 		sendMessage(sendRplErr(002, this, newUser, "", ""), this->_sockcom);
 		sendMessage(sendRplErr(003, this, newUser, "", ""), this->_sockcom);
@@ -215,7 +215,6 @@ void Server::newConnection(void)
 			if (clientSocket[i] == 0)
 			{
 				clientSocket[i] = this->_sockcom;
-				std::cout << "Adding to list of sockets as " << i << std::endl;
 				break;
 			}
 		}
@@ -279,7 +278,7 @@ void Server::connectToServer()
 					buf = receiveMessage(sd);
 					if (!buf.empty())
 					{
-						std::cout << "\033[1;34mRECV RETOUR :\033[0m " << buf;
+						std::cout << "\033[1;34mCOMMAND RECEIVED :\033[0m " << buf;
 						std::string command(buf);
 						int occ = buf.find_first_not_of(sep, 0);
 						buf = command.substr(occ, buf.length() - occ);

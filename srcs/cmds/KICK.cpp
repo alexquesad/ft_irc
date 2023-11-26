@@ -64,9 +64,9 @@ void kick(Server *serv, std::string buffer, int sd)
                     sendMessage(sendRplErr(441, serv, FIND_USER(sd), userNick, channelName), sd);
                     continue;
                 }
-                std::string userAnswer = userOutput(FIND_USER(sd));
+                std::string userAnswer = userOutput(FIND_USER(userToKickSd));
                 userAnswer += "PART " + channelName;
-                sendEveryoneInChanExceptUser(userAnswer, FIND_CHANNEL(channelName), userToKickSd);
+                sendEveryoneInChan(userAnswer, FIND_CHANNEL(channelName));
                 FIND_CHANNEL(channelName)->leftUser(userToKickSd);
                 if (FIND_CHANNEL(channelName)->getUsersNumber() == 0)
                 {
@@ -74,9 +74,6 @@ void kick(Server *serv, std::string buffer, int sd)
                     serv->getChannels().erase(channelName);
                 }
                 FIND_USER(userToKickSd)->getChannels().erase(channelName);
-                userAnswer = userOutput(FIND_USER(userToKickSd));
-                userAnswer += "PART " + channelName;
-                sendMessage(userAnswer, userToKickSd);
             }
         }
         if (buf.find('\r') != std::string::npos)
