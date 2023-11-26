@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "irc.hpp"
 
 Channel::Channel(std::string channelName) : _channelName(channelName), _topic("") {
 }

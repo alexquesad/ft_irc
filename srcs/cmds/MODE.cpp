@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "irc.hpp"
 
 void mode_o(Server *serv, Channel *channel, std::string mode, std::string buffer, int sd)
 {

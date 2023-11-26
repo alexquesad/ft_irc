@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "irc.hpp"
 
 void sendMessage(std::string message, int sd)
 {

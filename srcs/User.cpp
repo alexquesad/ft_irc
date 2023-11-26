@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "irc.hpp"
 
 User::User(std::string nickname, std::string username, std::string hostname, std::string realName) : _nickname(nickname), _username(username), _hostname(hostname), _realName(realName){
 }

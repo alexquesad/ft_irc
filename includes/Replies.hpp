@@ -1,6 +1,6 @@
 #pragma once
 
-#include "main.hpp"
+#include "irc.hpp"
 
 std::string sendRplErr(int code, Server *serv, User *user, std::string args, std::string args2);
 

@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "irc.hpp"
 
 int clientSocket[maxClients];
 bool isAlive = true;

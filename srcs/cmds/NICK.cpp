@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "irc.hpp"
 
 bool nicknameIsValid(std::string nick)
 {

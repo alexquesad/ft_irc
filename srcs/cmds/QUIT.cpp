@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "irc.hpp"
 
 extern int clientSocket[maxClients];
 

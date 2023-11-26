@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "irc.hpp"
 
 void kick(Server *serv, std::string buffer, int sd)
 {

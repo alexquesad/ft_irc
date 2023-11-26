@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "irc.hpp"
 
 void privmsg(Server *serv, std::string buffer, int sd)
 {

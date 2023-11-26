@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "irc.hpp"
 
 void oper(Server *serv, std::string buffer, int sd)
 {

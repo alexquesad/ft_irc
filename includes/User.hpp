@@ -1,6 +1,6 @@
 #pragma once
 
-#include "main.hpp"
+#include "irc.hpp"
 
 class User{
 	private:

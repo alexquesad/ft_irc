@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "irc.hpp"
 
 void    part(Server *serv, std::string buffer, int sd)
 {
