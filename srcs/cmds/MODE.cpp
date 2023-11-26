@@ -3,7 +3,7 @@
 void mode_o(Server *serv, Channel *channel, std::string mode, std::string buffer, int sd)
 {
     int i = 0;
-    for (int j = 0;buffer[i] && j < 3; i++)
+    for (int j = 0; buffer[i] && j < 3; i++)
         if (buffer[i] == ' ')
             j++;
     std::string name = buffer.substr(i, buffer.find('\r') != std::string::npos ? buffer.length() - 2 - i : buffer.length() - 1 - i);
@@ -11,7 +11,7 @@ void mode_o(Server *serv, Channel *channel, std::string mode, std::string buffer
     if (userSd == -1)
     {
         sendMessage(sendRplErr(441, serv, FIND_USER(sd), name, channel->getChannelName()), sd);
-        return ;
+        return;
     }
     channel->leftUser(userSd);
     if (mode[0] == '-')
@@ -26,7 +26,7 @@ void mode_o(Server *serv, Channel *channel, std::string mode, std::string buffer
 void mode_v(Server *serv, Channel *channel, std::string mode, std::string buffer, int sd)
 {
     int i = 0;
-    for (int j = 0;buffer[i] && j < 3; i++)
+    for (int j = 0; buffer[i] && j < 3; i++)
         if (buffer[i] == ' ')
             j++;
     std::string name = buffer.substr(i, buffer.find('\r') != std::string::npos ? buffer.length() - 2 - i : buffer.length() - 1 - i);
@@ -34,10 +34,10 @@ void mode_v(Server *serv, Channel *channel, std::string mode, std::string buffer
     if (userSd == -1)
     {
         sendMessage(sendRplErr(441, serv, FIND_USER(sd), name, channel->getChannelName()), sd);
-        return ;
+        return;
     }
     if (channel->isChanop(userSd) == true)
-        return ;
+        return;
     channel->leftUser(userSd);
     if (mode[0] == '-')
         channel->addUser(userSd, FIND_USER(userSd));
@@ -52,7 +52,7 @@ void mode_b(Server *serv, Channel *channel, std::string mode, std::string buffer
 {
     (void)mode;
     int i = 0;
-    for (int j = 0;buffer[i] && j < 3; i++)
+    for (int j = 0; buffer[i] && j < 3; i++)
         if (buffer[i] == ' ')
             j++;
     std::string name = buffer.substr(i, buffer.find('\r') != std::string::npos ? buffer.length() - 2 - i : buffer.length() - 1 - i);
@@ -78,7 +78,7 @@ void mode_b(Server *serv, Channel *channel, std::string mode, std::string buffer
                 name = nick;
         }
         else
-            return ;
+            return;
         if (mode[0] == '-')
             channel->getBanList().erase(name);
         else
@@ -94,10 +94,10 @@ void mode_k(Server *serv, Channel *channel, std::string mode, std::string buffer
     if (mode[0] == '-')
     {
         channel->setKey("");
-	return ;
+	    return;
     }
     int i = 0;
-    for (int j = 0;buffer[i] && j < 3; i++)
+    for (int j = 0; buffer[i] && j < 3; i++)
         if (buffer[i] == ' ')
             j++;
     std::string key(&buffer[i]);
@@ -128,10 +128,10 @@ void mode_l(Server *serv, Channel *channel, std::string mode, std::string buffer
     if (mode[0] == '-')
     {
 	    channel->setMaxUser(-1);
-	    return ;
+	    return;
     }
     int i = 0;
-    for (int j = 0;buffer[i] && j < 3; i++)
+    for (int j = 0; buffer[i] && j < 3; i++)
         if (buffer[i] == ' ')
             j++;
     std::string name = buffer.substr(i, buffer.find('\r') != std::string::npos ? buffer.length() - 2 - i : buffer.length() - 1 - i);
@@ -139,7 +139,7 @@ void mode_l(Server *serv, Channel *channel, std::string mode, std::string buffer
     if (maxUser < 0)
     {
 	    sendMessage("Max user key must be superior to 0.", sd);
-	    return ;
+	    return;
     }
     channel->setMaxUser(maxUser);
 }

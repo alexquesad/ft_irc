@@ -39,22 +39,22 @@ void nick(Server *serv, std::string buffer, int sd)
     if (newNickname.empty())
     {
         sendMessage(sendRplErr(431, serv, FIND_USER(sd), "", ""), sd);
-        return ;
+        return;
     }
     if (FIND_USER(sd)->getMode().find('r') != std::string::npos)
     {
         sendMessage(sendRplErr(484, serv, FIND_USER(sd), "", ""), sd);
-        return ;
+        return;
     }
     if (!nicknameIsValid(newNickname))
     {
         sendMessage(sendRplErr(432, serv, FIND_USER(sd), newNickname, ""), sd);
-        return ;
+        return;
     }
     if (nicknameIsInUse(serv, newNickname))
     {
         sendMessage(sendRplErr(433, serv, FIND_USER(sd), newNickname, ""), sd);
-        return ;
+        return;
     }
     std::string userAnswer = userOutput(FIND_USER(sd));
     userAnswer += buffer;

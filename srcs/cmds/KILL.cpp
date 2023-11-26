@@ -9,7 +9,7 @@ void kill(Server *serv, std::string buffer, int sd)
     if (FIND_USER(sd)->getMode().find('o') == std::string::npos)
     {
         sendMessage(sendRplErr(481, serv, FIND_USER(sd), "", ""), sd);
-        return ;
+        return;
     }
     name = buf.substr(buf.find(' ') + 1, buf.find('\r') != std::string::npos ? buf.find(':') - buf.find(' ') - 2 : buf.find(':') - buf.find(' ') - 1);
     if (name.empty())
@@ -20,7 +20,7 @@ void kill(Server *serv, std::string buffer, int sd)
     if (serv->searchUserByNickname(name) == -1)
     {
         sendMessage(sendRplErr(401, serv, FIND_USER(sd), name, ""), sd);
-        return ;
+        return;
     }
     int i = buf.find(':') + 1;
     int j = 0;
