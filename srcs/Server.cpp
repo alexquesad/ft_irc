@@ -3,6 +3,25 @@
 int clientSocket[maxClients];
 bool serverActive = true;
 
+/**
+ * @brief Constructs a Server object with the specified port and password.
+ * 
+ * This constructor initializes a Server object with the given port number and  password.
+ * It also sets up the command handler by mapping IRC commands to their corresponding member functions.
+ * The Server object is initialized with default values for server name and restart status.
+ * 
+ * @param port The port number on which the server will run.
+ * @param password The password required for server access.
+ * 
+ * Command handler setup:
+ * - Various IRC commands are mapped to their corresponding member functions for handling.
+ *   (e.g., NICK, JOIN, PRIVMSG, PING, PONG, PART, TOPIC, KICK, MODE, OPER, KILL, QUIT, RESTART)
+ *   The mapping allows for easy command processing during server operation.
+ * 
+ * Server object state:
+ * - _serverName is initialized to an empty string.
+ * - _isRestart is initialized to false.
+ */
 Server::Server(const std::string &port, const std::string &password) : _port(port), _password(password), _serverName(), _isRestart(false){
 	this->_commandhandler.insert(std::pair<std::string, command>("NICK", &nick));
 	this->_commandhandler.insert(std::pair<std::string, command>("JOIN", &join));
@@ -46,7 +65,23 @@ void sendMOTD(int sd)
 
 }
 
-int Server::newSocket()
+void    handler(int signum)
+{
+	(void)signum;
+	serverActive = false;
+}
+
+/**
+ * @brief NewServerSocket
+ *
+ * Configures the server socket with necessary options and binds it to the server address.
+ * Sets the socket to non-blocking mode and listens for incoming connections.
+ *
+ * @return The configured server socket.
+ * @throws std::runtime_error if an error occurs during configuration or binding.
+ */
+
+int Server::NewServerSocket()
 {
     // Creating a new socket
     int sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -81,10 +116,28 @@ int Server::newSocket()
     return sock;
 }
 
-/*
- *  Function to handle the initial steps when a new client connects to the server.
- *  Manages authentication, nickname validation, and user creation.
- *  Displays connection information and updates server state accordingly.
+/**
+ * @brief HandleNewConnection
+ *
+ * Accepts a new connection, processes the initial messages from the client, and establishes a new user session.
+ * Validates the received password, nickname, and user information, and adds the new user to the server.
+ *
+ * This function performs the following steps:
+ * 1. Accepts a new connection and obtains a new socket descriptor.
+ * 2. Displays information about the new connection.
+ * 3. Initializes variables for processing incoming messages.
+ * 4. Receives the first message from the new connection.
+ * 5. Processes the received message based on specific conditions.
+ * 6. Validates the received password and sets the 'isPassGood' flag.
+ * 7. Validates the received nickname and sets the 'isNickGood' flag.
+ * 8. Validates the received user information and sets the 'isUserGood' flag.
+ * 9. Continues processing based on the validity of the password, nickname, user, and server flags.
+ * 10. If conditions are met, sets the server name, creates a new user, and adds the user to the server.
+ * 11. Sends initial messages to the new user.
+ * 12. Adds the new socket to the array of client sockets.
+ * 13. Handles cases where the server is full or errors occur during the process.
+ *
+ * @throws std::runtime_error if an error occurs during the acceptance of the new connection or message reception.
  */
 
 void Server::handleNewConnection(void)
@@ -284,24 +337,38 @@ void Server::handleNewConnection(void)
         sendMessage(sendRplErr(005, this, NULL, nick, ""), this->_newClientSocket);
 }
 
-void    handler(int signum)
-{
-	(void)signum;
-	serverActive = false;
-}
-
-/*
- * @brief Main server loop handling incoming connections and client commands.
- * The function initializes a server socket, monitors socket activity using select,
- * accepts new connections, and processes commands from existing clients. It supports
- * the ability to restart the server. The loop continues until either a restart is
- * requested or the server is no longer active.
+/**
+ * @brief Run the IRC server, managing new and existing client connections.
+ *
+ * This function initializes and monitors sockets for both server and client connections.
+ * It uses the select system call to efficiently handle multiple sockets concurrently.
+ * The server continuously checks for new connections and processes commands from existing clients.
+ * The main loop runs until a server restart is requested or the server is deactivated.
+ *
+ * @details
+ * - Creates a new server socket and sets up variables for socket activity monitoring.
+ * - Initializes an array to store client sockets.
+ * - Displays a message indicating the server is listening.
+ * - Sets up a signal handler for interrupt signals.
+ * - In the main loop:
+ *   - Clears the socket set and adds the master socket.
+ *   - Adds child sockets to the set.
+ *   - Waits for activity on one of the sockets using the select system call.
+ *   - Handles a new connection if the server socket is set.
+ *   - Processes commands from existing client sockets.
+ * - The loop continues until a server restart is requested or the server is deactivated.
+ *
+ * @see handleNewConnection(), receiveMessage(), _commandhandler
+ *
+ * @remark
+ * This function is crucial for the continuous operation of the IRC server, managing
+ * both new connections and existing client commands efficiently.
  */
 
 void Server::runServer()
 {
 	// Create a new server socket
-	this->_sockserver = newSocket();
+	this->_sockserver = NewServerSocket();
 
 	// Initialize variables for monitoring socket activity
 	fd_set readfds;
@@ -412,6 +479,24 @@ void Server::runServer()
     	runServer();
 	}
 }
+
+/**
+ * @brief Receive a complete message from a client socket.
+ *
+ * This function reads data from the provided socket descriptor until it forms a complete
+ * message terminated by a newline character ('\n'). It ensures that the server is active
+ * to avoid unnecessary processing when shutting down.
+ *
+ * @param sd The socket descriptor for the client.
+ * @return A string containing the received message.
+ *
+ * @throws std::runtime_error if an error occurs during the reception of the message.
+ *
+ * @remark
+ * The function uses a buffer to accumulate data until a newline character is encountered,
+ * indicating the end of the message. It handles the serverActive flag to avoid processing
+ * messages when the server is in the process of shutting down.
+ */
 
 std::string Server::receiveMessage(int sd) const
 {

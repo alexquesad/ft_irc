@@ -18,7 +18,7 @@ class Server{
 		struct sockaddr_in _server;
 		std::string _serverName;
 		bool _isRestart;
-		int newSocket();
+		int NewServerSocket();
 		void handleNewConnection(void);
 
 	public:
