@@ -5,7 +5,7 @@ SRCS =	srcs/main.cpp\
 		srcs/User.cpp\
 		srcs/Channel.cpp\
 		srcs/send_replies.cpp\
-		srcs/send.cpp\
+		srcs/send_msgs.cpp\
 		srcs/cmds/NICK.cpp\
 		srcs/cmds/JOIN.cpp\
 		srcs/cmds/PRIVMSG.cpp\
