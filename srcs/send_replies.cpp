@@ -1,5 +1,23 @@
 #include "irc.hpp"
 
+/**
+ * @brief Constructs an IRC server response based on the provided code, server, and user information.
+ * 
+ * This function takes an integer code, a pointer to a Server object (serv), a pointer to a User object (user),
+ * and two strings (args and args2) to generate an appropriate IRC server response. It dynamically builds the response
+ * by considering the code, server information, and user details if available.
+ * 
+ * If a user is provided, the response includes the user's nickname; otherwise, it uses a "*" placeholder.
+ * The constructed IRC response is returned as a string.
+ * 
+ * @param code The numeric code representing the IRC response type.
+ * @param serv Pointer to the Server object providing server information.
+ * @param user Pointer to the User object providing user information (can be nullptr if not applicable).
+ * @param args Additional string argument used in constructing certain responses.
+ * @param args2 Additional string argument used in constructing certain responses.
+ * @return The generated IRC server response as a string.
+ */
+
 std::string sendRplErr(int code, Server *serv, User *user, std::string args, std::string args2)
 {
     std::stringstream ss;
