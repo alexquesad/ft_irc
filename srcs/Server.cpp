@@ -1,7 +1,7 @@
 #include "irc.hpp"
 
 int clientSocket[maxClients];
-bool isAlive = true;
+bool serverActive = true;
 
 Server::Server(const std::string &port, const std::string &password) : _port(port), _password(password), _serverName(), _isRestart(false){
 	this->_commandhandler.insert(std::pair<std::string, command>("NICK", &nick));
@@ -48,264 +48,368 @@ void sendMOTD(int sd)
 
 int Server::newSocket()
 {
-	int sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock < 0)
-		throw std::runtime_error("Error creating socket.\n");
-	int tmp = 1;
-	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &tmp, sizeof(tmp)))
-		throw std::runtime_error("Error while setting up socket.\n");
-	if (fcntl(sock, F_SETFL, O_NONBLOCK) == -1)
-		throw std::runtime_error("Error while setting socket NON-BLOCKING mode.\n");
-	_server.sin_addr.s_addr = INADDR_ANY;
-	_server.sin_port = htons(static_cast<unsigned short>(std::strtoul(this->_port.c_str(), NULL, 0)));
-	_server.sin_family = AF_INET;
-	if (bind(sock, (const struct sockaddr*)&_server, sizeof(_server)) < 0)
-		throw std::runtime_error("Error binding socket.\n");
-	if (listen(sock, 10) < 0)
-		throw std::runtime_error("Error listening on socket.\n");
-	return sock;
+    // Creating a new socket
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    
+    // Checking for errors in socket creation
+    if (sock < 0)
+        throw std::runtime_error("Error creating socket.\n");
+
+    // Setting socket options to allow reuse of the address
+    int tmp = 1;
+    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &tmp, sizeof(tmp)))
+        throw std::runtime_error("Error while setting up socket.\n");
+
+    // Setting the socket to non-blocking mode
+    if (fcntl(sock, F_SETFL, O_NONBLOCK) == -1)
+        throw std::runtime_error("Error while setting socket NON-BLOCKING mode.\n");
+
+    // Configuring the server address structure
+    _server.sin_addr.s_addr = INADDR_ANY;
+    _server.sin_port = htons(static_cast<unsigned short>(std::strtoul(this->_port.c_str(), NULL, 0)));
+    _server.sin_family = AF_INET;
+
+    // Binding the socket to the server address
+    if (bind(sock, (const struct sockaddr*)&_server, sizeof(_server)) < 0)
+        throw std::runtime_error("Error binding socket.\n");
+
+    // Setting the socket to listen for incoming connections
+    if (listen(sock, 10) < 0)
+        throw std::runtime_error("Error listening on socket.\n");
+
+    // Returning the created socket
+    return sock;
 }
 
-void Server::newConnection(void)
-{
-	socklen_t csize = sizeof(_server);
-	if ((this->_sockcom = accept(this->_sockserver, (struct sockaddr *)&_server, &csize)) < 0)
-	{
-		perror("accept");
-		exit(EXIT_FAILURE);
-	}
-	//inform user of socket number - used in send and receive commands
-	std::cout << "New connection , socket fd is " << this->_sockcom << " , ip is : " << inet_ntoa(_server.sin_addr) << " , port : " <<  ntohs(_server.sin_port) << std::endl;
-	std::string ret;
-	//send new connection greeting message
-	size_t occ;
-	size_t firstOcc;
-	bool isPassGood = false, isNickGood = false, isUserGood = false;
-	std::string nick = "", user = "", host = "", serverName = "", realName = "", pass = "";
+/*
+ *  Function to handle the initial steps when a new client connects to the server.
+ *  Manages authentication, nickname validation, and user creation.
+ *  Displays connection information and updates server state accordingly.
+ */
 
-	ret = this->receiveMessage(this->_sockcom);
-	if (((ret.find("CAP LS") != std::string::npos && ret.find("PASS ") == std::string::npos) || (ret.find("CAP LS") != std::string::npos && ret.find("PASS ") == std::string::npos && ret.find("NICK ") != std::string::npos)) && ret.find("USER ") == std::string::npos)
-		ret = this->receiveMessage(this->_sockcom);
-	if ((occ = ret.find("PASS ")) != std::string::npos)
-	{
-		if ((firstOcc = ret.find_first_not_of(sep, occ + 5)) == std::string::npos)
-		{
-			sendMessage(sendRplErr(461, this, NULL, "PASS", ""), this->_sockcom);
-			close(this->_sockcom);
-		}
-		else
-		{
-			for (int i = 0; ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
-				pass += ret[firstOcc + i];
-			if (pass.empty())
-			{
-				sendMessage(sendRplErr(461, this, NULL, "PASS", ""), this->_sockcom);
-				close(this->_sockcom);
-			}
-			else if (pass.compare(this->_password) != 0)
-			{
-				sendMessage("WRONG PASSWORD", this->_sockcom);
-				close(this->_sockcom);
-			}
-			else
-				isPassGood = true;
-		}
-	}
-	else
-	{
-		sendMessage("You need to enter a pass!", this->_sockcom);
-		close(this->_sockcom);
-	}
-	if (isPassGood == true)
-	{
-		if (ret.find("NICK ") == std::string::npos)
-			ret = this->receiveMessage(this->_sockcom);
-		if ((occ = ret.find("NICK ")) != std::string::npos)
-		{
-			if ((firstOcc = ret.find_first_not_of(sep, occ + 5)) == std::string::npos)
-			{
-				sendMessage(sendRplErr(432, this, NULL, nick, ""), this->_sockcom);
-				close(this->_sockcom);
-			}
-			else
-			{
-				nick = ret.substr(firstOcc, ret.find_first_of(endBuf, firstOcc) - firstOcc);
-				nick = nick.substr(0, nick.find_last_not_of(sep, nick.size()) + 1);
-				if (!nicknameIsValid(nick))
-				{
-					sendMessage(sendRplErr(432, this, NULL, nick, ""), this->_sockcom);
-					close(this->_sockcom);	
-				}
-				else if (nicknameIsInUse(this, nick))
-				{
-					sendMessage(sendRplErr(433, this, NULL, nick, ""), this->_sockcom);
-					sendMessage("Please try reconnect with an available nickname.", this->_sockcom);
-					close(this->_sockcom);
-				}
-				else
-					isNickGood = true;
-			}
-		}
-		else
-		{
-			sendMessage("You have to enter a nickname\nUsage: NICK [nickname]", this->_sockcom);
-			close(this->_sockcom);
-		}
-		if (isUserGood == false && isNickGood == true)
-		{
-			if (ret.find("USER ") == std::string::npos)
-				ret = this->receiveMessage(this->_sockcom);
-			if ((occ = ret.find("USER ")) != std::string::npos)
-			{
-				int i = 0;
-				//username
-				if ((firstOcc = ret.find_first_not_of(sep, occ + 5)) == std::string::npos)
-					sendMessage(sendRplErr(461, this, NULL, "USER", ""), this->_sockcom);
-				else
-				{
-					user = ret.substr(firstOcc, (i = ret.find_first_of(sep, firstOcc)) - firstOcc);
-					//hostname
-					if ((firstOcc = ret.find_first_not_of(sep, i)) == std::string::npos)
-						sendMessage(sendRplErr(461, this, NULL, "USER", ""), this->_sockcom);
-					else
-					{
-						host = ret.substr(firstOcc, (i = ret.find_first_of(sep, firstOcc)) - firstOcc);
-						//serverName
-						if ((firstOcc = ret.find_first_not_of(sep, i)) == std::string::npos)
-							sendMessage(sendRplErr(461, this, NULL, "USER", ""), this->_sockcom);
-						else
-						{
-							serverName = ret.substr(firstOcc, (i = ret.find_first_of(sep, firstOcc)) - firstOcc);
-							//realName
-							if ((firstOcc = ret.find_first_not_of(sep, i)) == std::string::npos)
-								sendMessage(sendRplErr(461, this, NULL, "USER", ""), this->_sockcom);
-							else
-							{
-								realName = ret.substr(firstOcc, (i = ret.find_first_of(sep, firstOcc)) - firstOcc);
-								realName = realName.substr(0, realName.find_last_not_of(sep, realName.size()) + 1);
-							}
-						}
-					}
-				}
-				if (!(user.empty() || host.empty() || serverName.empty() || realName.empty()))
-					isUserGood = true;
-			}
-		}
-		if (isUserGood == false && isNickGood == true)
-		{
-			sendMessage("Usage: USER [username] [hostname] [serverName] [realName]", this->_sockcom);
-			close(this->_sockcom);
-		}
-	}
-	if (isPassGood == true && _users.size() < 10 && isNickGood == true && isUserGood == true && isAlive == true)
-	{
-		this->_serverName = serverName;
-		User *newUser = new User(nick, user, host, realName);
-		this->setUsers(this->_sockcom, newUser);
-		std::cout << "Number of users connected on the server: " << this->_users.size() << std::endl;
-		sendMessage(sendRplErr(001, this, newUser, "", ""), this->_sockcom);
-		sendMessage(sendRplErr(002, this, newUser, "", ""), this->_sockcom);
-		sendMessage(sendRplErr(003, this, newUser, "", ""), this->_sockcom);
-		sendMessage(sendRplErr(004, this, newUser, "", ""), this->_sockcom);
-		sendMOTD(this->_sockcom);
-		//add new socket to array of sockets
-		for (int i = 0; i < maxClients; i++)
-		{
-			//if position is empty
-			if (clientSocket[i] == 0)
-			{
-				clientSocket[i] = this->_sockcom;
-				break;
-			}
-		}
-	}
-	else if (isPassGood == true && isNickGood == true && isAlive == true && isUserGood == true)
-		sendMessage(sendRplErr(005, this, NULL, nick, ""), this->_sockcom);
+void Server::handleNewConnection(void)
+{
+    // Set up variables for handling the new connection
+    socklen_t csize = sizeof(_server);
+
+    // Accept the incoming connection, obtain a new socket descriptor
+    if ((this->_newClientSocket = accept(this->_sockserver, (struct sockaddr *)&_server, &csize)) < 0)
+    {
+        perror("accept");
+        exit(EXIT_FAILURE);
+    }
+    // Display information about the new connection
+    std::cout << "New connection , socket fd is " << this->_newClientSocket << " , ip is : " << inet_ntoa(_server.sin_addr) << " , port : " << ntohs(_server.sin_port) << std::endl;
+
+    // Initialize variables for processing incoming messages
+    std::string ret;
+    size_t occ;
+    size_t firstOcc;
+    bool isPassGood = false, isNickGood = false, isUserGood = false;
+    std::string nick = "", user = "", host = "", serverName = "", realName = "", pass = "";
+
+    // Receive the first message from the new connection
+    ret = this->receiveMessage(this->_newClientSocket);
+
+    // Process the received message based on specific conditions
+    if (((ret.find("CAP LS") != std::string::npos && ret.find("PASS ") == std::string::npos) || (ret.find("CAP LS") != std::string::npos && ret.find("PASS ") == std::string::npos && ret.find("NICK ") != std::string::npos)) && ret.find("USER ") == std::string::npos)
+        ret = this->receiveMessage(this->_newClientSocket);
+
+    // Check for the presence of "PASS" in the received message
+    if ((occ = ret.find("PASS ")) != std::string::npos)
+    {
+        // Extract the password from the message
+        if ((firstOcc = ret.find_first_not_of(sep, occ + 5)) == std::string::npos)
+        {
+            // Handle the case where the password is missing
+            sendMessage(sendRplErr(461, this, NULL, "PASS", ""), this->_newClientSocket);
+            close(this->_newClientSocket);
+        }
+        else
+        {
+            // Construct the password by iterating through the characters
+            for (int i = 0; ret[firstOcc + i] && sep.find(ret[firstOcc + i]) == std::string::npos; i++)
+                pass += ret[firstOcc + i];
+            // Check the validity of the password
+            if (pass.empty())
+            {
+                // Handle the case where the password is empty
+                sendMessage(sendRplErr(461, this, NULL, "PASS", ""), this->_newClientSocket);
+                close(this->_newClientSocket);
+            }
+            else if (pass.compare(this->_password) != 0)
+            {
+                // Handle the case of an incorrect password
+                sendMessage("WRONG PASSWORD", this->_newClientSocket);
+                close(this->_newClientSocket);
+            }
+            else
+                // Set the flag indicating a good password
+                isPassGood = true;
+        }
+    }
+    else
+    {
+        // Handle the case where "PASS" is not found in the message
+        sendMessage("You need to enter a pass!", this->_newClientSocket);
+        close(this->_newClientSocket);
+    }
+    // Continue processing based on the validity of the password
+    if (isPassGood == true)
+    {
+        // Check for the presence of "NICK" in the received message
+        if (ret.find("NICK ") == std::string::npos)
+            ret = this->receiveMessage(this->_newClientSocket);
+        // Process the message if "NICK" is found
+        if ((occ = ret.find("NICK ")) != std::string::npos)
+        {
+            // Extract the nickname from the message
+            if ((firstOcc = ret.find_first_not_of(sep, occ + 5)) == std::string::npos)
+            {
+                // Handle the case where the nickname is missing
+                sendMessage(sendRplErr(432, this, NULL, nick, ""), this->_newClientSocket);
+                close(this->_newClientSocket);
+            }
+            else
+            {
+                // Construct the nickname and ensure its validity
+                nick = ret.substr(firstOcc, ret.find_first_of(endBuf, firstOcc) - firstOcc);
+                nick = nick.substr(0, nick.find_last_not_of(sep, nick.size()) + 1);
+                if (!nicknameIsValid(nick))
+                {
+                    // Handle the case of an invalid nickname
+                    sendMessage(sendRplErr(432, this, NULL, nick, ""), this->_newClientSocket);
+                    close(this->_newClientSocket);
+                }
+                else if (nicknameIsInUse(this, nick))
+                {
+                    // Handle the case of a nickname already in use
+                    sendMessage(sendRplErr(433, this, NULL, nick, ""), this->_newClientSocket);
+                    sendMessage("Please try reconnecting with an available nickname.", this->_newClientSocket);
+                    close(this->_newClientSocket);
+                }
+                else
+                    // Set the flag indicating a good nickname
+                    isNickGood = true;
+            }
+        }
+        else
+        {
+            // Handle the case where "NICK" is not found in the message
+            sendMessage("You have to enter a nickname\nUsage: NICK [nickname]", this->_newClientSocket);
+            close(this->_newClientSocket);
+        }
+        // Continue processing based on the validity of the nickname and user flag
+        if (isUserGood == false && isNickGood == true)
+        {
+            // Check for the presence of "USER" in the received message
+            if (ret.find("USER ") == std::string::npos)
+                ret = this->receiveMessage(this->_newClientSocket);
+            // Process the message if "USER" is found
+            if ((occ = ret.find("USER ")) != std::string::npos)
+            {
+                int i = 0;
+                // Extract the username from the message
+                if ((firstOcc = ret.find_first_not_of(sep, occ + 5)) == std::string::npos)
+                    sendMessage(sendRplErr(461, this, NULL, "USER", ""), this->_newClientSocket);
+                else
+                {
+                    user = ret.substr(firstOcc, (i = ret.find_first_of(sep, firstOcc)) - firstOcc);
+
+                    // Extract the hostname from the message
+                    if ((firstOcc = ret.find_first_not_of(sep, i)) == std::string::npos)
+                        sendMessage(sendRplErr(461, this, NULL, "USER", ""), this->_newClientSocket);
+                    else
+                    {
+                        host = ret.substr(firstOcc, (i = ret.find_first_of(sep, firstOcc)) - firstOcc);
+
+                        // Extract the serverName from the message
+                        if ((firstOcc = ret.find_first_not_of(sep, i)) == std::string::npos)
+                            sendMessage(sendRplErr(461, this, NULL, "USER", ""), this->_newClientSocket);
+                        else
+                        {
+                            serverName = ret.substr(firstOcc, (i = ret.find_first_of(sep, firstOcc)) - firstOcc);
+
+                            // Extract the realName from the message
+                            if ((firstOcc = ret.find_first_not_of(sep, i)) == std::string::npos)
+                                sendMessage(sendRplErr(461, this, NULL, "USER", ""), this->_newClientSocket);
+                            else
+                            {
+                                realName = ret.substr(firstOcc, (i = ret.find_first_of(sep, firstOcc)) - firstOcc);
+                                realName = realName.substr(0, realName.find_last_not_of(sep, realName.size()) + 1);
+                            }
+                        }
+                    }
+                }
+                // Set the user flag based on the validity of extracted information
+                if (!(user.empty() || host.empty() || serverName.empty() || realName.empty()))
+                    isUserGood = true;
+            }
+        }
+        // Handle the case where "USER" is not found and user flag is not set
+        if (isUserGood == false && isNickGood == true)
+        {
+            sendMessage("Usage: USER [username] [hostname] [serverName] [realName]", this->_newClientSocket);
+            close(this->_newClientSocket);
+        }
+    }
+    // Continue processing based on the validity of the password, nickname, user, and server flags
+    if (isPassGood == true && _users.size() < 10 && isNickGood == true && isUserGood == true && serverActive == true)
+    {
+        // Set the server name, create a new user, and add the user to the server
+        this->_serverName = serverName;
+        User *newUser = new User(nick, user, host, realName);
+        this->setUsers(this->_newClientSocket, newUser);
+        std::cout << "Number of users connected on the server: " << this->_users.size() << std::endl;
+        
+        // Send initial messages to the new user
+        sendMessage(sendRplErr(001, this, newUser, "", ""), this->_newClientSocket);
+        sendMessage(sendRplErr(002, this, newUser, "", ""), this->_newClientSocket);
+        sendMessage(sendRplErr(003, this, newUser, "", ""), this->_newClientSocket);
+        sendMessage(sendRplErr(004, this, newUser, "", ""), this->_newClientSocket);
+        sendMOTD(this->_newClientSocket);
+
+        // Add the new socket to the array of client sockets
+        for (int i = 0; i < maxClients; i++)
+        {
+            if (clientSocket[i] == 0)
+            {
+                clientSocket[i] = this->_newClientSocket;
+                break;
+            }
+        }
+    }
+    // Handle the case where the server is full
+    else if (isPassGood == true && isNickGood == true && serverActive == true && isUserGood == true)
+        sendMessage(sendRplErr(005, this, NULL, nick, ""), this->_newClientSocket);
 }
 
 void    handler(int signum)
 {
 	(void)signum;
-	isAlive = false;
+	serverActive = false;
 }
 
-void Server::connectToServer()
+/*
+ * @brief Main server loop handling incoming connections and client commands.
+ * The function initializes a server socket, monitors socket activity using select,
+ * accepts new connections, and processes commands from existing clients. It supports
+ * the ability to restart the server. The loop continues until either a restart is
+ * requested or the server is no longer active.
+ */
+
+void Server::runServer()
 {
+	// Create a new server socket
 	this->_sockserver = newSocket();
+
+	// Initialize variables for monitoring socket activity
 	fd_set readfds;
 	int sd, activity, maxSd;
+
+	// Initialize an array to store client sockets
 	for (int i = 0; i < maxClients; i++)
-        clientSocket[i] = 0;
+    clientSocket[i] = 0;
+
+	// Display a message indicating the server is listening
 	std::cout << "listening..." << std::endl;
-	while (this->_isRestart == false && isAlive == true)
+
+	// Main loop for server operation
+	while (this->_isRestart == false && serverActive == true)
 	{
+    	// Set up a signal handler for interrupt signals
     	std::signal(SIGINT, handler);
-		//clear the socket set
-        FD_ZERO(&readfds);
-        //add master socket to set
-        FD_SET(this->_sockserver, &readfds);
-        maxSd = this->_sockserver;
-        //add child sockets to set
-        for (int i = 0; i < maxClients; i++)
-        {
-            //socket descriptor
-            sd = clientSocket[i];
-            //if valid socket descriptor then add to read list
-            if (sd > 0)
-                FD_SET(sd , &readfds);
-            //highest file descriptor number, need it for the select function
-            if (sd > maxSd)
-                maxSd = sd;
-        }
-        //wait for an activity on one of the sockets , timeout is NULL ,
-        //so wait indefinitely
-        activity = select(maxSd + 1 , &readfds , NULL , NULL , NULL);
-        if ((activity < 0) && (errno != EINTR))
-            std::cerr << ("select error") << std::endl;
-		//connect new user
-		if (FD_ISSET(this->_sockserver, &readfds) && isAlive == true)
-            newConnection();
-		else if (isAlive == true)
-		{
-			for (int i = 0; i < maxClients; i++)
-			{
-				sd = clientSocket[i];
-				if (FD_ISSET(sd , &readfds))
-				{
-					std::string buf;
-					//Check if it was for closing , and also read the
-					//incoming message
-					buf = receiveMessage(sd);
-					if (!buf.empty())
-					{
-						std::cout << "\033[1;34mCOMMAND RECEIVED :\033[0m " << buf;
-						std::string command(buf);
-						int occ = buf.find_first_not_of(sep, 0);
-						buf = command.substr(occ, buf.length() - occ);
-						command = buf.substr(0, buf.find_first_of(sep, 0));
-						if (_commandhandler.find(command) != _commandhandler.end())
-							(_commandhandler[command])(this, buf, sd);
-						break;
-					}
-				}
-			}
-		}
+
+    	// Clear the socket set
+    	FD_ZERO(&readfds);
+
+    	// Add the master socket to the set
+    	FD_SET(this->_sockserver, &readfds);
+    	maxSd = this->_sockserver;
+
+    	// Add child sockets to the set
+    	for (int i = 0; i < maxClients; i++)
+    	{
+        	// Get the socket descriptor
+        	sd = clientSocket[i];
+
+        	// If it's a valid socket descriptor, add it to the read list
+        	if (sd > 0)
+            	FD_SET(sd, &readfds);
+
+        	// Update the highest file descriptor number
+        	if (sd > maxSd)
+            	maxSd = sd;
+    	}
+
+    	// Wait for activity on one of the sockets, with an indefinite timeout
+    	activity = select(maxSd + 1, &readfds, NULL, NULL, NULL);
+
+    	// Check for select errors
+    	if ((activity < 0) && (errno != EINTR))
+        	std::cerr << ("select error") << std::endl;
+
+    	// Handle new connection if the server socket is set
+    	if (FD_ISSET(this->_sockserver, &readfds) && serverActive == true)
+        	handleNewConnection();
+    	// Handle existing client sockets
+    	else if (serverActive == true)
+    	{
+        	for (int i = 0; i < maxClients; i++)
+        	{
+            	sd = clientSocket[i];
+
+            	// Check if the socket is set in the readfds set
+            	if (FD_ISSET(sd, &readfds))
+            	{
+                	std::string buf;
+
+                	// Check if it's for closing, and read the incoming message
+                	buf = receiveMessage(sd);
+
+                	// Process the received command using a command handler
+                	if (!buf.empty())
+                	{
+                    	std::cout << "\033[1;34mCOMMAND RECEIVED :\033[0m " << buf;
+                    	std::string command(buf);
+						// Extract the command from the message
+                    	int occ = buf.find_first_not_of(sep, 0);
+                    	buf = command.substr(occ, buf.length() - occ);
+                    	command = buf.substr(0, buf.find_first_of(sep, 0));
+
+						//If the command is registered in the command handler, execute it
+                    	if (_commandhandler.find(command) != _commandhandler.end())
+                        	(_commandhandler[command])(this, buf, sd);
+
+                    	break;
+                	}
+         		}
+        	}
+    	}
 	}
+
+	// Clean up resources after exiting the main loop
 	clearAll();
+
+	// Close all client sockets
 	for (int i = 0; i < maxClients; i++)
 	{
-		if (clientSocket[i] != 0)
-		{
-			close(clientSocket[i]);
-			clientSocket[i] = 0;
-		}
+    	if (clientSocket[i] != 0)
+    	{
+        	close(clientSocket[i]);
+        	clientSocket[i] = 0;
+    	}
 	}
+
+	// Close the server socket
 	close(this->_sockserver);
-	if (this->_isRestart == true && isAlive == true)
+
+	// Restart the server if requested
+	if (this->_isRestart == true && serverActive == true)
 	{
-		this->_isRestart = false;
-		std::cout << "SERVER RESTARTING..." << std::endl;
-		connectToServer();
+    	this->_isRestart = false;
+    	std::cout << "SERVER RESTARTING..." << std::endl;
+    	runServer();
 	}
 }
 
@@ -314,7 +418,7 @@ std::string Server::receiveMessage(int sd) const
 	char buffer[1024];
 	std::string buf = "";
 	memset(buffer, 0, 1024);
-	while ((buf += buffer).find('\n') == std::string::npos && isAlive == true)
+	while ((buf += buffer).find('\n') == std::string::npos && serverActive == true)
 		if (recv(sd, buffer, 1024, 0) < 0)
 			throw std::runtime_error("Error receiving message");
 	return buf;

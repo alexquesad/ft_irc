@@ -9,7 +9,7 @@ class Server{
 
 	private:
 		int _sockserver;
-		int _sockcom;
+		int _newClientSocket;
 		const std::string _port;
 		const std::string _password;
 		std::map<int, User*> _users;
@@ -19,12 +19,12 @@ class Server{
 		std::string _serverName;
 		bool _isRestart;
 		int newSocket();
-		void newConnection(void);
+		void handleNewConnection(void);
 
 	public:
 		Server(const std::string &port, const std::string &password);
 		~Server();
-		void connectToServer();
+		void runServer();
 		std::map<std::string, Channel*> & getChannels();
 		std::map<int, User*> & getUsers() ;
 		std::string receiveMessage(int sd) const;
