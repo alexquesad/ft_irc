@@ -63,6 +63,9 @@ std::string sendRplErr(int code, Server *serv, User *user, std::string args, std
         case 332:
             ret += RPL_TOPIC(args, args2);
 			break;
+        case 341:
+            ret += RPL_INVITING(args, args2);
+		 	break;
         case 353:
             ret += RPL_NAMREPLY(args, args2);
 			break;
@@ -104,6 +107,9 @@ std::string sendRplErr(int code, Server *serv, User *user, std::string args, std
 			break;
         case 442:
             ret += ERR_NOTONCHANNEL(args);
+			break;
+        case 443:
+            ret += ERR_USERALREADYINCHANNEL(args, args2);
 			break;
         case 461:
             ret += ERR_NEEDMOREPARAMS(args);

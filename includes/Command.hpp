@@ -17,3 +17,4 @@ void oper(Server *serv, std::string buffer, int sd);
 void kill(Server *serv, std::string buffer, int sd);
 void quit(Server *serv, std::string buffer, int sd);
 void restart(Server *serv, std::string buffer, int sd);
+void invite(Server *serv, std::string buffer, int sd);

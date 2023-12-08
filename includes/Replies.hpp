@@ -42,6 +42,10 @@ std::string sendRplErr(int code, Server *serv, User *user, std::string args, std
 #define RPL_TOPIC(channel, topic) \
     (channel + " :" + topic)
 
+//341
+# define RPL_INVITING(channel, nick) \
+    (channel + " " + nick)
+
 //353
 #define RPL_NAMREPLY(channel, listOfUsers) \
     ("= " + channel + " :" + listOfUsers)
@@ -99,6 +103,10 @@ std::string sendRplErr(int code, Server *serv, User *user, std::string args, std
 //442
 #define ERR_NOTONCHANNEL(channel) \
     (channel + " :You're not on that channel")
+
+// 443
+#define ERR_USERALREADYINCHANNEL(nick, channel) \
+    (nick + " " + channel + " :is already on channel")
 
 //461
 #define ERR_NEEDMOREPARAMS(command) \

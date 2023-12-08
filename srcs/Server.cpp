@@ -37,6 +37,7 @@ Server::Server(const std::string &port, const std::string &password) : _port(por
 	this->_commandhandler.insert(std::pair<std::string, command>("kill", &kill));
 	this->_commandhandler.insert(std::pair<std::string, command>("KILL", &kill));
 	this->_commandhandler.insert(std::pair<std::string, command>("QUIT", &quit));
+    this->_commandhandler.insert(std::pair<std::string, command>("INVITE", &invite));
 	this->_commandhandler.insert(std::pair<std::string, command>("RESTART", &restart));
 	this->_commandhandler.insert(std::pair<std::string, command>("restart", &restart));
 }

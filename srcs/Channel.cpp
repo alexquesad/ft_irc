@@ -9,6 +9,7 @@ Channel::~Channel()
     this->_chanops.clear();
 	this->_voices.clear();
 	this->_banList.clear();
+    this->_invitedUsers.clear();
 }
 
 int Channel::getUsersNumber() const
@@ -96,15 +97,23 @@ void Channel::addVoices(int sd, User *user)
     this->_voices.insert(std::make_pair(sd, user));
 }
 
+// Member function to remove a user from the channel based on socket descriptor.
 void Channel::leftUser(int sd)
 {
+    // Declare an iterator for maps containing pointers to User objects.
     std::map<int, User*>::iterator it;
+
+    // Look for the user in the regular users map (_users) using the socket descriptor.
     if ((it = this->_users.find(sd)) != this->_users.end())
-        this->_users.erase(it);
+        this->_users.erase(it); // If found, erase the user from the _users map.
+    // If the user is not found in _users, look for them in the channel operators map (_chanops).
     else if ((it = this->_chanops.find(sd)) != this->_chanops.end())
-        this->_chanops.erase(it);
+        this->_chanops.erase(it); // If found, erase the user from the _chanops map.
+    // If the user is not found in _chanops, look for them in the voices map (_voices).
     else if ((it = this->_voices.find(sd)) != this->_voices.end())
-        this->_voices.erase(it);
+        this->_voices.erase(it); // If found, erase the user from the _voices map.
+
+    // If the user is not found in any maps, no operation is performed.
 }
 
 int Channel::searchUserByNickname(std::string nickname)
@@ -127,29 +136,45 @@ int Channel::searchUserByNickname(std::string nickname)
     return (-1);
 }
 
+// Function to get a concatenated string of all user nicknames in the channel.
 std::string Channel::getListOfUserInChan()
 {
+    // Declare an empty string to store the output list of user nicknames.
     std::string output;
-    for (std::map<int, User *>::iterator it = this->_chanops.begin(); it != this->_chanops.end(); it++)
+
+    // Iterate over the map containing channel operators (chanops).
+    for (std::map<int, User*>::iterator it = this->_chanops.begin(); it != this->_chanops.end(); it++)
     {
+        // For each channel operator, if the output string is not empty, add a space before the next nickname.
         if (!output.empty())
             output += " ";
+        // Prefix the nickname with '@' to indicate channel operator status and append it to the output string.
         output += "@";
         output += it->second->getNickname();
     }
-    for (std::map<int, User *>::iterator it = this->_voices.begin(); it != this->_voices.end(); it++)
+
+    // Iterate over the map containing users with voice privilege (voices).
+    for (std::map<int, User*>::iterator it = this->_voices.begin(); it != this->_voices.end(); it++)
     {
+        // For each voice, if the output string is not empty, add a space before the next nickname.
         if (!output.empty())
             output += " ";
+        // Prefix the nickname with '+' to indicate voice status and append it to the output string.
         output += "+";
         output += it->second->getNickname();
     }
-    for (std::map<int, User *>::iterator it = this->_users.begin(); it != this->_users.end(); it++)
+
+    // Iterate over the regular users map.
+    for (std::map<int, User*>::iterator it = this->_users.begin(); it != this->_users.end(); it++)
     {
+        // For each regular user, if the output string is not empty, add a space before the next nickname.
         if (!output.empty())
             output += " ";
+        // Append the user's nickname to the output string without any prefix.
         output += it->second->getNickname();
     }
+
+    // Return the concatenated string of nicknames.
     return (output);
 }
 
@@ -184,4 +209,14 @@ bool Channel::isBan(std::string nickname)
     if (this->_banList.find(nickname) != this->_banList.end())
         return (true);
     return (false);
+}
+
+void Channel::addInvitee(const std::string& nickname) 
+{
+    _invitedUsers.insert(nickname);
+}
+    
+bool Channel::isUserInvited(const std::string& nickname) const 
+{
+    return _invitedUsers.find(nickname) != _invitedUsers.end();
 }

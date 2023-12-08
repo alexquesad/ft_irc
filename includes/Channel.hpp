@@ -16,6 +16,7 @@ class Channel
         std::string _key;
         int _maxUser;
         std::map<std::string, std::string> _banList;
+        std::set<std::string> _invitedUsers;
 
     public:
         Channel(std::string channelName);
@@ -44,4 +45,7 @@ class Channel
         bool isChanop(int sd);
         bool isVoices(int sd);
         bool isBan(std::string nickname);
+        void addInvitee(const std::string& nickname);
+        bool isUserInvited(const std::string& nickname) const;
+
 };
