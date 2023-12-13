@@ -248,7 +248,7 @@ void mode_l(Server *serv, Channel *channel, std::string mode, std::string buffer
     // Check if the mode string starts with a '-' indicating removing the limit.
     if (mode[0] == '-')
     {
-        channel->setMaxUser(-1); // Removes the user limit from the channel.
+        channel->setMaxUser(10); // Removes the user limit from the channel.
         return; // Early exit from the function.
     }
 
@@ -327,7 +327,7 @@ void channelMode(Server *serv, Channel *channel, std::string mode, int sd, std::
                 // Call the appropriate mode handler function for valid modes.
                 modehandler[mode[i]](serv, channel, mode, buffer, sd);
         	    // For modes 'k' and 'l', we keep track which were successfully deleted.
-                if (mode[i] == 'k' || mode[i] == 'l')
+                if (mode[i] == 'k' || mode[i] == 'l' || mode[i] == 'b')
                     deletedMode += mode[i];
             }
             // If the mode exists in the current modes, remove it.
@@ -373,7 +373,7 @@ void channelMode(Server *serv, Channel *channel, std::string mode, int sd, std::
                 // Call the appropriate mode handler function for valid modes.
                 modehandler[mode[i]](serv, channel, mode, buffer, sd);
                 // Track modes 'k' (when set) and 'l' as they are added.
-                if ((mode[i] == 'k' && channel->getKey() != "") || mode[i] == 'l')
+                if ((mode[i] == 'k' && channel->getKey() != "") || mode[i] == 'l' || mode[i] == 'b')
                     addedMode += mode[i];
             }
             // Append mode only if it's not already present in the current modes.

@@ -45,6 +45,13 @@ void invite(Server *serv, std::string buffer, int sd)
         sendMessage(sendRplErr(442, serv, FIND_USER(sd), channelName, ""), sd);
         return;
     }
+
+    if (FIND_USER(sd)->getMode().find('r') != std::string::npos)
+    {
+        // Send error code 484 (Restricted) to the client.
+        sendMessage(sendRplErr(484, serv, FIND_USER(sd), "", ""), sd);
+        return;
+    }
             
     Channel* channel = FIND_CHANNEL(channelName);
 

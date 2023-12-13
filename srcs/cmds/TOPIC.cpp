@@ -56,7 +56,7 @@ void topic(Server *serv, std::string buffer, int sd)
             // Handle anonymous mode for the channel if set.
             if (FIND_CHANNEL(channelName)->getMode().find("a") != std::string::npos)
                 userAnswer = anonymousOutput();
-            userAnswer += "TOPIC " + channelName + " " + FIND_CHANNEL(channelName)->getTopic();
+            userAnswer += "TOPIC " + FIND_CHANNEL(channelName)->getTopic();
             // Broadcast the topic change to all users in the channel.
             sendEveryoneInChan(userAnswer, FIND_CHANNEL(channelName));
         }

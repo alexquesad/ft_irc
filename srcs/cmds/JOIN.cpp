@@ -95,11 +95,6 @@ void join(Server *serv, std::string buffer, int sd)
         // "k" mode: Check if the channel has a key set and compare with the provided key.
         if (FIND_CHANNEL(channelName)->getMode().find("k") != std::string::npos)
         {
-            if (key.empty())
-            {
-                sendMessage(sendRplErr(461, serv, FIND_USER(sd), "JOIN", ""), sd);
-                return;
-            }
             if (FIND_CHANNEL(channelName)->getKey().compare(key) != 0)
             {
                 sendMessage(sendRplErr(475, serv, FIND_USER(sd), channelName, ""), sd);
